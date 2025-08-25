@@ -3,8 +3,15 @@
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import {IProgram, IUniversity} from "@/interfaces";
 
-export const RegistrationForm = () => {
+interface Props {
+    period?: string
+    program?: IProgram,
+    universities?: IUniversity[]
+}
+
+export const RegistrationForm = ({period,program,universities}:Props) => {
     const [formData, setFormData] = useState({
         dni: "",
         apellidos: "",
@@ -31,15 +38,6 @@ export const RegistrationForm = () => {
     const condiciones = [
         { value: "privado", label: "Privado" },
         { value: "estatal", label: "Estatal" }
-    ]
-
-    const universidades = [
-        { value: "uni", label: "Universidad Nacional de Ingeniería" },
-        { value: "unmsm", label: "Universidad Nacional Mayor de San Marcos" },
-        { value: "pucp", label: "Pontificia Universidad Católica del Perú" },
-        { value: "upn", label: "Universidad Privada del Norte" },
-        { value: "upc", label: "Universidad Peruana de Ciencias Aplicadas" },
-        { value: "otra", label: "Otra Universidad" }
     ]
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -75,17 +73,17 @@ export const RegistrationForm = () => {
                                     Formulario de Inscripción
                                 </h1>
                                 <h2 className="text-lg text-gray-600 mb-1">
-                                    Postgrado - Facultad de Ingeniería Industrial y de Sistemas
+                                    Universidad Nacional de Ingeniería
                                 </h2>
                                 <p className="text-sm text-gray-500 mb-1">
-                                    Universidad Nacional de Ingeniería
+                                    Postgrado - Facultad de Ingeniería Industrial y de Sistemas
                                 </p>
                                 <div className="mt-2">
                                     <span className="block text-base font-semibold text-gray-800">
-                                        Business Analytics e Inteligencia Artificial Aplicada
+                                        {program!.program_types.name} - {program!.name || "Programa de Ejemplo"}
                                     </span>
                                     <span className="block text-sm text-gray-600 mt-1">
-                                        Periodo de admisión: 2025-1
+                                        Periodo de admisión: {period || "2024-I"}
                                     </span>
                                 </div>
                             </div>
@@ -264,9 +262,9 @@ export const RegistrationForm = () => {
                                         className="w-full h-9 px-3 py-1 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white"
                                     >
                                         <option value="">Seleccione una universidad</option>
-                                        {universidades.map((universidad) => (
-                                            <option key={universidad.value} value={universidad.value}>
-                                                {universidad.label}
+                                        {universities?.map((universidad) => (
+                                            <option key={universidad.id} value={universidad.id}>
+                                                {universidad.name}
                                             </option>
                                         ))}
                                     </select>

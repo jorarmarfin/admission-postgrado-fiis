@@ -5,8 +5,8 @@ export interface IAcademicPeriod {
     admission: boolean;
 }
 
-export interface IAcademicPeriodResponse<T> {
-    success: boolean;
-    data: IAcademicPeriod
+export interface ApiResponse<T> {
+    status: string;
+    data: T;
     message?: string;
 }

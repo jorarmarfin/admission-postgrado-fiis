@@ -1,12 +1,13 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import {academicPeriodService} from "@/services";
 
-export default function Home() {
-  // Datos del postulante (puedes reemplazar con datos reales)
+export default async function Home() {
+    const activePeriod = await academicPeriodService.getActivePeriod();
+    // Datos del postulante (puedes reemplazar con datos reales)
   const postulante = {
-    nombre: "Juan Carlos Mendoza Silva",
-    periodo: "2026-1"
+    nombre: "Luis Mayta"
   }
 
   return (
@@ -24,7 +25,7 @@ export default function Home() {
             <div className="flex items-center justify-center space-x-2 text-lg text-gray-600">
               <span>Proceso de Admisión</span>
               <div className="w-2 h-2 bg-red-800 rounded-full"></div>
-              <span className="font-semibold text-red-800">Periodo {postulante.periodo}</span>
+              <span className="font-semibold text-red-800">Periodo {activePeriod.name}</span>
             </div>
             <p className="text-gray-500 mt-2">
               Universidad Nacional de Ingeniería - Facultad de Ingeniería Industrial y de Sistemas

@@ -1,8 +1,8 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import Image from "next/image" // Importa el componente Image
+import {Metadata} from "next";
 
-export const metadata = {
+export const metadata:Metadata = {
     title: "Página no encontrada - UNI FIIS",
     description: "La página que buscas no existe o ha sido movida",
 }

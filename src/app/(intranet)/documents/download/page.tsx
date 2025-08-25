@@ -205,7 +205,7 @@ export default function DocumentsDownloadPage() {
                             </div>
                             <div className="mt-6 p-4 bg-blue-100 rounded-lg">
                                 <p className="text-sm text-blue-800 font-medium">
-                                    💡 <strong>Consejo:</strong> Te recomendamos imprimir la "Guía del Postulante" para tenerla como referencia física durante todo el proceso.
+                                    💡 <strong>Consejo:</strong> Te recomendamos imprimir la Guía del Postulante para tenerla como referencia física durante todo el proceso.
                                 </p>
                             </div>
                         </div>
