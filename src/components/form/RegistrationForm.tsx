@@ -102,7 +102,7 @@ export const RegistrationForm = ({period,program,universities}:Props) => {
                                 </div>
                                 Datos Personales
                             </h3>
-                            
+
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <label htmlFor="dni" className="block text-sm font-medium text-gray-700 mb-2">
@@ -119,7 +119,7 @@ export const RegistrationForm = ({period,program,universities}:Props) => {
                                         className="w-full"
                                     />
                                 </div>
-                                
+
                                 <div>
                                     <label htmlFor="apellidos" className="block text-sm font-medium text-gray-700 mb-2">
                                         Apellidos *
@@ -134,7 +134,7 @@ export const RegistrationForm = ({period,program,universities}:Props) => {
                                         className="w-full"
                                     />
                                 </div>
-                                
+
                                 <div>
                                     <label htmlFor="nombres" className="block text-sm font-medium text-gray-700 mb-2">
                                         Nombres *
@@ -165,7 +165,7 @@ export const RegistrationForm = ({period,program,universities}:Props) => {
                                         className="w-full"
                                     />
                                 </div>
-                                
+
                                 <div>
                                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                                         Email *
@@ -180,7 +180,7 @@ export const RegistrationForm = ({period,program,universities}:Props) => {
                                         className="w-full"
                                     />
                                 </div>
-                                
+
                                 <div>
                                     <label htmlFor="celular" className="block text-sm font-medium text-gray-700 mb-2">
                                         Celular *
@@ -206,7 +206,7 @@ export const RegistrationForm = ({period,program,universities}:Props) => {
                                 </div>
                                 Información Bancaria y Académica
                             </h3>
-                            
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label htmlFor="banco" className="block text-sm font-medium text-gray-700 mb-2">
@@ -227,7 +227,7 @@ export const RegistrationForm = ({period,program,universities}:Props) => {
                                         ))}
                                     </select>
                                 </div>
-                                
+
                                 <div>
                                     <label htmlFor="condicion" className="block text-sm font-medium text-gray-700 mb-2">
                                         Condición *
@@ -269,7 +269,7 @@ export const RegistrationForm = ({period,program,universities}:Props) => {
                                         ))}
                                     </select>
                                 </div>
-                                
+
                                 <div>
                                     <label htmlFor="carreraProfesional" className="block text-sm font-medium text-gray-700 mb-2">
                                         Carrera Profesional *
@@ -295,7 +295,7 @@ export const RegistrationForm = ({period,program,universities}:Props) => {
                                 </div>
                                 Datos de Facturación
                             </h3>
-                            
+
                             <div className="mb-6">
                                 <label className="block text-sm font-medium text-gray-700 mb-4">
                                     ¿Requiere factura? *
@@ -343,7 +343,7 @@ export const RegistrationForm = ({period,program,universities}:Props) => {
                                             className="w-full"
                                         />
                                     </div>
-                                    
+
                                     <div>
                                         <label htmlFor="razonSocial" className="block text-sm font-medium text-gray-700 mb-2">
                                             Razón Social *
@@ -358,7 +358,7 @@ export const RegistrationForm = ({period,program,universities}:Props) => {
                                             className="w-full"
                                         />
                                     </div>
-                                    
+
                                     <div className="md:col-span-2">
                                         <label htmlFor="direccionRuc" className="block text-sm font-medium text-gray-700 mb-2">
                                             Dirección asociada al RUC *

@@ -1,0 +1,43 @@
+// Interfaces para la aplicación de admisión
+
+export interface IApplicationRequest {
+    first_name: string;
+    last_name: string;
+    personal_email: string;
+    phones: string;
+    document_type: string;
+    document_number: string;
+    program_id: number;
+    academic_period_id: number;
+    payment_order_bank: string;
+    birth_date: string;
+    university_id: number;
+    undergraduate_major: string;
+}
+
+export interface IApplicantData {
+    student_id: number;
+    academic_period_id: number;
+    program_id: number;
+    updated_at: string;
+    created_at: string;
+    id: number;
+}
+
+export interface IApplicationSuccessResponse {
+    status: "success";
+    message: string;
+    data: {
+        applicant: IApplicantData;
+    };
+}
+
+export interface IApplicationErrorResponse {
+    status: "error";
+    message: string;
+    errors: {
+        [key: string]: string[];
+    };
+}
+
+export type IApplicationResponse = IApplicationSuccessResponse | IApplicationErrorResponse;

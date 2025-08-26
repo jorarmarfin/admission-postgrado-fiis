@@ -2,6 +2,13 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {academicPeriodService} from "@/services";
+import {Metadata} from "next";
+
+export const metadata: Metadata = {
+    title: "Panel de Admisión",
+    description: "Panel principal del proceso de admisión",
+}
+
 
 export default async function Home() {
     const activePeriod = await academicPeriodService.getActivePeriod();

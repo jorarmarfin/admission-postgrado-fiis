@@ -1,6 +1,6 @@
 import {RegistrationForm} from "@/components";
 import {Metadata} from "next";
-import {academicPeriodService, programService, universityService} from "@/services";
+import {academicPeriodService, bankService, programService, universityService} from "@/services";
 import {isValidUuid} from "@/lib/utils";
 import {notFound} from "next/navigation";
 
@@ -22,10 +22,12 @@ export default async function Page(props:{params: pageProps}) {
     const activePeriod = await academicPeriodService.getActivePeriod();
     const program = await programService.getProgramByUuid(slug);
     const universities = await universityService.getUniversities();
+    const banks = await bankService.getBanks();
 
     return <RegistrationForm
         period={activePeriod.name}
         program={program}
         universities={universities}
+        banks={banks}
     />;
 }
