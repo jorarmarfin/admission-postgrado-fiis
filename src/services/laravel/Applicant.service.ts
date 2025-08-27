@@ -1,6 +1,9 @@
 import { IApplicationRequest, IApplicationResponse } from "@/interfaces";
 
-const API_BASE_URL = process.env.NEXT_BACKEND_API_URL;
+const SERVER_BASE = process.env.NEXT_BACKEND_API_URL;            // solo server
+const CLIENT_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+export const API_BASE_URL =
+    typeof window === 'undefined' ? SERVER_BASE : CLIENT_BASE;
 
 export const applicantService = {
     /**

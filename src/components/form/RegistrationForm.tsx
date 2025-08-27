@@ -4,7 +4,7 @@ import {useState} from "react"
 import {Input} from "@/components/ui/input"
 import {Button} from "@/components/ui/button"
 import {Loader2, CheckCircle, AlertCircle} from "lucide-react"
-import {IBank, IProgram, IUniversity, IApplicationRequest} from "@/interfaces"
+import {IBank, IUniversity, IApplicationRequest} from "@/interfaces"
 import {useRegistrationForm} from "@/hooks/useRegistrationForm"
 import {Alert, AlertDescription} from "@/components/ui/alert";
 
@@ -37,45 +37,157 @@ export const RegistrationForm = ({
         direccionRuc: ""
     })
 
+    const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({})
+
     const {isLoading, error, success, validationErrors, submitApplication, resetState} = useRegistrationForm()
 
-    const condiciones = [
-        {value: "privado", label: "Privado"},
-        {value: "estatal", label: "Estatal"}
-    ]
+    // Función para formatear el celular
+    const formatCelular = (value: string) => {
+        const numbers = value.replace(/\D/g, '');
+        if (numbers.length <= 9) {
+            return numbers.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3').trim();
+        }
+        return numbers.slice(0, 9).replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+    };
+
+    // Función para validar campo individual
+    const validateField = (name: string, value: string) => {
+        let error = '';
+
+        switch (name) {
+            case 'dni':
+                if (!value) error = 'El DNI es obligatorio';
+                else if (!/^\d{8}$/.test(value)) error = 'El DNI debe tener 8 dígitos';
+                break;
+            case 'apellidos':
+                if (!value) error = 'Los apellidos son obligatorios';
+                else if (value.length < 2) error = 'Los apellidos deben tener al menos 2 caracteres';
+                break;
+            case 'nombres':
+                if (!value) error = 'Los nombres son obligatorios';
+                else if (value.length < 2) error = 'Los nombres deben tener al menos 2 caracteres';
+                break;
+            case 'fechaNacimiento':
+                if (!value) error = 'La fecha de nacimiento es obligatoria';
+                else {
+                    const today = new Date();
+                    const birthDate = new Date(value);
+                    const age = today.getFullYear() - birthDate.getFullYear();
+                    if (age < 18) error = 'Debe ser mayor de 18 años';
+                    if (age > 100) error = 'Fecha de nacimiento no válida';
+                }
+                break;
+            case 'email':
+                if (!value) error = 'El email es obligatorio';
+                else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Ingrese un email válido';
+                break;
+            case 'celular':
+                const cleanNumber = value.replace(/\D/g, '');
+                if (!value) error = 'El celular es obligatorio';
+                else if (cleanNumber.length !== 9) error = 'El celular debe tener 9 dígitos';
+                else if (!cleanNumber.startsWith('9')) error = 'El celular debe comenzar con 9';
+                break;
+            case 'banco':
+                if (!value) error = 'Seleccione un banco';
+                break;
+            case 'universidad':
+                if (!value) error = 'Seleccione una universidad';
+                break;
+            case 'carreraProfesional':
+                if (!value) error = 'La carrera profesional es obligatoria';
+                else if (value.length < 3) error = 'La carrera debe tener al menos 3 caracteres';
+                break;
+            case 'ruc':
+                if (formData.requiereFactura === 'si') {
+                    if (!value) error = 'El RUC es obligatorio';
+                    else if (!/^\d{11}$/.test(value)) error = 'El RUC debe tener 11 dígitos';
+                }
+                break;
+            case 'razonSocial':
+                if (formData.requiereFactura === 'si' && !value) {
+                    error = 'La razón social es obligatoria';
+                }
+                break;
+            case 'direccionRuc':
+                if (formData.requiereFactura === 'si' && !value) {
+                    error = 'La dirección fiscal es obligatoria';
+                }
+                break;
+        }
+
+        setFieldErrors(prev => ({
+            ...prev,
+            [name]: error
+        }));
+
+        return error === '';
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const {name, value} = e.target
+        let {name, value} = e.target;
+
+        // Aplicar máscara al celular
+        if (name === 'celular') {
+            value = formatCelular(value);
+        }
+
+        // Formatear DNI (solo números)
+        if (name === 'dni') {
+            value = value.replace(/\D/g, '').slice(0, 8);
+        }
+
+        // Formatear RUC (solo números)
+        if (name === 'ruc') {
+            value = value.replace(/\D/g, '').slice(0, 11);
+        }
+
         setFormData(prev => ({
             ...prev,
             [name]: value
-        }))
-    }
+        }));
+
+        // Validar campo en tiempo real
+        validateField(name, value);
+    };
 
     const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData(prev => ({
             ...prev,
             requiereFactura: e.target.value
-        }))
-    }
+        }));
+
+        // Limpiar errores de campos de facturación si cambia a "no"
+        if (e.target.value === 'no') {
+            setFieldErrors(prev => {
+                const newErrors = {...prev};
+                delete newErrors.ruc;
+                delete newErrors.razonSocial;
+                delete newErrors.direccionRuc;
+                return newErrors;
+            });
+        }
+    };
 
     const validateForm = () => {
-        const requiredFields = ['dni', 'apellidos', 'nombres', 'fechaNacimiento', 'email', 'celular', 'banco', 'universidad', 'carreraProfesional']
+        const requiredFields = ['dni', 'apellidos', 'nombres', 'fechaNacimiento', 'email', 'celular', 'banco', 'universidad', 'carreraProfesional'];
+        let isValid = true;
 
-        for (const field of requiredFields) {
-            if (!formData[field as keyof typeof formData]) {
-                return false
+        // Validar campos requeridos
+        requiredFields.forEach(field => {
+            if (!validateField(field, formData[field as keyof typeof formData])) {
+                isValid = false;
             }
-        }
+        });
 
+        // Validar campos de facturación si es necesario
         if (formData.requiereFactura === 'si') {
-            if (!formData.ruc || !formData.razonSocial || !formData.direccionRuc) {
-                return false
-            }
+            if (!validateField('ruc', formData.ruc)) isValid = false;
+            if (!validateField('razonSocial', formData.razonSocial)) isValid = false;
+            if (!validateField('direccionRuc', formData.direccionRuc)) isValid = false;
         }
 
-        return true
-    }
+        return isValid;
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -88,13 +200,13 @@ export const RegistrationForm = ({
         const applicationData: IApplicationRequest = {
             document_type: 'DNI',
             document_number: formData.dni,
-            program_id: program_id || 1, // ID del programa fijo
-            academic_period_id: 1, // ID del periodo académico fijo
+            program_id: program_id || 1,
+            academic_period_id: academic_period_id || 1,
             last_name: formData.apellidos,
             first_name: formData.nombres,
-            birth_date: formData.fechaNacimiento,
+            birth_date: formData.fechaNacimiento, // Ya está en formato YYYY-MM-DD
             personal_email: formData.email,
-            phones: formData.celular,
+            phones: formData.celular.replace(/\s/g, ''), // Enviar sin espacios
             payment_order_bank: formData.banco,
             university_id: parseInt(formData.universidad),
             undergraduate_major: formData.carreraProfesional,
@@ -123,6 +235,7 @@ export const RegistrationForm = ({
             razonSocial: "",
             direccionRuc: ""
         })
+        setFieldErrors({})
         resetState()
     }
 
@@ -186,8 +299,11 @@ export const RegistrationForm = ({
                                 value={formData.dni}
                                 onChange={handleInputChange}
                                 maxLength={8}
-                                className="w-full"
+                                className={`w-full ${fieldErrors.dni ? 'border-red-500 focus:ring-red-500' : ''}`}
                             />
+                            {fieldErrors.dni && (
+                                <p className="mt-1 text-sm text-red-600">{fieldErrors.dni}</p>
+                            )}
                         </div>
 
                         <div>
@@ -201,8 +317,11 @@ export const RegistrationForm = ({
                                 placeholder="Apellidos completos"
                                 value={formData.apellidos}
                                 onChange={handleInputChange}
-                                className="w-full"
+                                className={`w-full ${fieldErrors.apellidos ? 'border-red-500 focus:ring-red-500' : ''}`}
                             />
+                            {fieldErrors.apellidos && (
+                                <p className="mt-1 text-sm text-red-600">{fieldErrors.apellidos}</p>
+                            )}
                         </div>
 
                         <div>
@@ -216,8 +335,11 @@ export const RegistrationForm = ({
                                 placeholder="Nombres completos"
                                 value={formData.nombres}
                                 onChange={handleInputChange}
-                                className="w-full"
+                                className={`w-full ${fieldErrors.nombres ? 'border-red-500 focus:ring-red-500' : ''}`}
                             />
+                            {fieldErrors.nombres && (
+                                <p className="mt-1 text-sm text-red-600">{fieldErrors.nombres}</p>
+                            )}
                         </div>
                     </div>
 
@@ -232,8 +354,11 @@ export const RegistrationForm = ({
                                 type="date"
                                 value={formData.fechaNacimiento}
                                 onChange={handleInputChange}
-                                className="w-full"
+                                className={`w-full ${fieldErrors.fechaNacimiento ? 'border-red-500 focus:ring-red-500' : ''}`}
                             />
+                            {fieldErrors.fechaNacimiento && (
+                                <p className="mt-1 text-sm text-red-600">{fieldErrors.fechaNacimiento}</p>
+                            )}
                         </div>
 
                         <div>
@@ -247,8 +372,11 @@ export const RegistrationForm = ({
                                 placeholder="correo@ejemplo.com"
                                 value={formData.email}
                                 onChange={handleInputChange}
-                                className="w-full"
+                                className={`w-full ${fieldErrors.email ? 'border-red-500 focus:ring-red-500' : ''}`}
                             />
+                            {fieldErrors.email && (
+                                <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>
+                            )}
                         </div>
 
                         <div>
@@ -262,8 +390,11 @@ export const RegistrationForm = ({
                                 placeholder="999 999 999"
                                 value={formData.celular}
                                 onChange={handleInputChange}
-                                className="w-full"
+                                className={`w-full ${fieldErrors.celular ? 'border-red-500 focus:ring-red-500' : ''}`}
                             />
+                            {fieldErrors.celular && (
+                                <p className="mt-1 text-sm text-red-600">{fieldErrors.celular}</p>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -287,7 +418,9 @@ export const RegistrationForm = ({
                                 name="banco"
                                 value={formData.banco}
                                 onChange={handleInputChange}
-                                className="w-full h-9 px-3 py-1 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white"
+                                className={`w-full h-9 px-3 py-1 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:border-red-500 bg-white ${
+                                    fieldErrors.banco ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
+                                }`}
                             >
                                 <option value="">Seleccione un banco</option>
                                 {banks?.map((banco) => (
@@ -296,6 +429,9 @@ export const RegistrationForm = ({
                                     </option>
                                 ))}
                             </select>
+                            {fieldErrors.banco && (
+                                <p className="mt-1 text-sm text-red-600">{fieldErrors.banco}</p>
+                            )}
                         </div>
                         <div>
                             <label htmlFor="universidad" className="block text-sm font-medium text-gray-700 mb-2">
@@ -306,7 +442,9 @@ export const RegistrationForm = ({
                                 name="universidad"
                                 value={formData.universidad}
                                 onChange={handleInputChange}
-                                className="w-full h-9 px-3 py-1 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white"
+                                className={`w-full h-9 px-3 py-1 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:border-red-500 bg-white ${
+                                    fieldErrors.universidad ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
+                                }`}
                             >
                                 <option value="">Seleccione una universidad</option>
                                 {universities?.map((universidad) => (
@@ -315,6 +453,9 @@ export const RegistrationForm = ({
                                     </option>
                                 ))}
                             </select>
+                            {fieldErrors.universidad && (
+                                <p className="mt-1 text-sm text-red-600">{fieldErrors.universidad}</p>
+                            )}
                         </div>
                     </div>
 
@@ -331,8 +472,11 @@ export const RegistrationForm = ({
                                 placeholder="Ingrese su carrera profesional"
                                 value={formData.carreraProfesional}
                                 onChange={handleInputChange}
-                                className="w-full"
+                                className={`w-full ${fieldErrors.carreraProfesional ? 'border-red-500 focus:ring-red-500' : ''}`}
                             />
+                            {fieldErrors.carreraProfesional && (
+                                <p className="mt-1 text-sm text-red-600">{fieldErrors.carreraProfesional}</p>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -390,8 +534,11 @@ export const RegistrationForm = ({
                                     value={formData.ruc}
                                     onChange={handleInputChange}
                                     maxLength={11}
-                                    className="w-full"
+                                    className={`w-full ${fieldErrors.ruc ? 'border-red-500 focus:ring-red-500' : ''}`}
                                 />
+                                {fieldErrors.ruc && (
+                                    <p className="mt-1 text-sm text-red-600">{fieldErrors.ruc}</p>
+                                )}
                             </div>
 
                             <div>
@@ -405,8 +552,11 @@ export const RegistrationForm = ({
                                     placeholder="Ingrese la razón social"
                                     value={formData.razonSocial}
                                     onChange={handleInputChange}
-                                    className="w-full"
+                                    className={`w-full ${fieldErrors.razonSocial ? 'border-red-500 focus:ring-red-500' : ''}`}
                                 />
+                                {fieldErrors.razonSocial && (
+                                    <p className="mt-1 text-sm text-red-600">{fieldErrors.razonSocial}</p>
+                                )}
                             </div>
 
                             <div className="md:col-span-2">
@@ -420,8 +570,11 @@ export const RegistrationForm = ({
                                     placeholder="Ingrese la dirección fiscal"
                                     value={formData.direccionRuc}
                                     onChange={handleInputChange}
-                                    className="w-full"
+                                    className={`w-full ${fieldErrors.direccionRuc ? 'border-red-500 focus:ring-red-500' : ''}`}
                                 />
+                                {fieldErrors.direccionRuc && (
+                                    <p className="mt-1 text-sm text-red-600">{fieldErrors.direccionRuc}</p>
+                                )}
                             </div>
                         </div>
                     )}
