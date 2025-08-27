@@ -2,5 +2,6 @@
 export * from './AcademicPeriod.interface';
 export * from './Application.interface';
 export * from './Bank.interface';
+export * from './DocumentType.interface';
 export * from './Program.interface';
 export * from './University.interface';

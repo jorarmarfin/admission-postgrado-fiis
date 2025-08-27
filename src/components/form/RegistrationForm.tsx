@@ -1,226 +1,112 @@
 "use client"
 
-import {useState} from "react"
-import {Input} from "@/components/ui/input"
-import {Button} from "@/components/ui/button"
-import {Loader2, CheckCircle, AlertCircle} from "lucide-react"
-import {IBank, IUniversity, IApplicationRequest} from "@/interfaces"
-import {useRegistrationForm} from "@/hooks/useRegistrationForm"
-import {Alert, AlertDescription} from "@/components/ui/alert";
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Loader2, CheckCircle, AlertCircle } from "lucide-react"
+import {IBank, IUniversity, IApplicationRequest, IDocumentType} from "@/interfaces"
+import { useRegistrationForm } from "@/hooks/useRegistrationForm"
 
 interface Props {
-    universities?: IUniversity[],
-    banks?: IBank[],
-    program_id?: number,
-    academic_period_id?: number,
+    universities?: IUniversity[]
+    banks?: IBank[]
+    program_id?: number
+    academic_period_id?: number
+    document_types?: IDocumentType[]
 }
 
-export const RegistrationForm = ({
-                                     universities,
-                                     banks,
-                                     program_id,
-                                     academic_period_id
-                                 }: Props) => {
-    const [formData, setFormData] = useState({
-        dni: "",
-        apellidos: "",
-        nombres: "",
-        fechaNacimiento: "",
-        email: "",
-        celular: "",
-        banco: "",
-        universidad: "",
-        carreraProfesional: "",
-        requiereFactura: "no",
-        ruc: "",
-        razonSocial: "",
-        direccionRuc: ""
-    })
-
-    const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({})
-
-    const {isLoading, error, success, validationErrors, submitApplication, resetState} = useRegistrationForm()
-
-    // Función para formatear el celular
-    const formatCelular = (value: string) => {
-        const numbers = value.replace(/\D/g, '');
-        if (numbers.length <= 9) {
-            return numbers.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3').trim();
-        }
-        return numbers.slice(0, 9).replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
-    };
-
-    // Función para validar campo individual
-    const validateField = (name: string, value: string) => {
-        let error = '';
-
-        switch (name) {
-            case 'dni':
-                if (!value) error = 'El DNI es obligatorio';
-                else if (!/^\d{8}$/.test(value)) error = 'El DNI debe tener 8 dígitos';
-                break;
-            case 'apellidos':
-                if (!value) error = 'Los apellidos son obligatorios';
-                else if (value.length < 2) error = 'Los apellidos deben tener al menos 2 caracteres';
-                break;
-            case 'nombres':
-                if (!value) error = 'Los nombres son obligatorios';
-                else if (value.length < 2) error = 'Los nombres deben tener al menos 2 caracteres';
-                break;
-            case 'fechaNacimiento':
-                if (!value) error = 'La fecha de nacimiento es obligatoria';
-                else {
-                    const today = new Date();
-                    const birthDate = new Date(value);
-                    const age = today.getFullYear() - birthDate.getFullYear();
-                    if (age < 18) error = 'Debe ser mayor de 18 años';
-                    if (age > 100) error = 'Fecha de nacimiento no válida';
-                }
-                break;
-            case 'email':
-                if (!value) error = 'El email es obligatorio';
-                else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Ingrese un email válido';
-                break;
-            case 'celular':
-                const cleanNumber = value.replace(/\D/g, '');
-                if (!value) error = 'El celular es obligatorio';
-                else if (cleanNumber.length !== 9) error = 'El celular debe tener 9 dígitos';
-                else if (!cleanNumber.startsWith('9')) error = 'El celular debe comenzar con 9';
-                break;
-            case 'banco':
-                if (!value) error = 'Seleccione un banco';
-                break;
-            case 'universidad':
-                if (!value) error = 'Seleccione una universidad';
-                break;
-            case 'carreraProfesional':
-                if (!value) error = 'La carrera profesional es obligatoria';
-                else if (value.length < 3) error = 'La carrera debe tener al menos 3 caracteres';
-                break;
-            case 'ruc':
-                if (formData.requiereFactura === 'si') {
-                    if (!value) error = 'El RUC es obligatorio';
-                    else if (!/^\d{11}$/.test(value)) error = 'El RUC debe tener 11 dígitos';
-                }
-                break;
-            case 'razonSocial':
-                if (formData.requiereFactura === 'si' && !value) {
-                    error = 'La razón social es obligatoria';
-                }
-                break;
-            case 'direccionRuc':
-                if (formData.requiereFactura === 'si' && !value) {
-                    error = 'La dirección fiscal es obligatoria';
-                }
-                break;
-        }
-
-        setFieldErrors(prev => ({
-            ...prev,
-            [name]: error
-        }));
-
-        return error === '';
-    };
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        let {name, value} = e.target;
-
-        // Aplicar máscara al celular
-        if (name === 'celular') {
-            value = formatCelular(value);
-        }
-
-        // Formatear DNI (solo números)
-        if (name === 'dni') {
-            value = value.replace(/\D/g, '').slice(0, 8);
-        }
-
-        // Formatear RUC (solo números)
-        if (name === 'ruc') {
-            value = value.replace(/\D/g, '').slice(0, 11);
-        }
-
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-
-        // Validar campo en tiempo real
-        validateField(name, value);
-    };
-
-    const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData(prev => ({
-            ...prev,
-            requiereFactura: e.target.value
-        }));
-
-        // Limpiar errores de campos de facturación si cambia a "no"
-        if (e.target.value === 'no') {
-            setFieldErrors(prev => {
-                const newErrors = {...prev};
-                delete newErrors.ruc;
-                delete newErrors.razonSocial;
-                delete newErrors.direccionRuc;
-                return newErrors;
-            });
-        }
-    };
-
-    const validateForm = () => {
-        const requiredFields = ['dni', 'apellidos', 'nombres', 'fechaNacimiento', 'email', 'celular', 'banco', 'universidad', 'carreraProfesional'];
-        let isValid = true;
-
-        // Validar campos requeridos
-        requiredFields.forEach(field => {
-            if (!validateField(field, formData[field as keyof typeof formData])) {
-                isValid = false;
-            }
-        });
-
-        // Validar campos de facturación si es necesario
-        if (formData.requiereFactura === 'si') {
-            if (!validateField('ruc', formData.ruc)) isValid = false;
-            if (!validateField('razonSocial', formData.razonSocial)) isValid = false;
-            if (!validateField('direccionRuc', formData.direccionRuc)) isValid = false;
-        }
-
-        return isValid;
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-
-        if (!validateForm()) {
-            return
-        }
-
-        // Mapear formData al formato IApplicationRequest
-        const applicationData: IApplicationRequest = {
-            document_type: 'DNI',
-            document_number: formData.dni,
-            program_id: program_id || 1,
-            academic_period_id: academic_period_id || 1,
-            last_name: formData.apellidos,
-            first_name: formData.nombres,
-            birth_date: formData.fechaNacimiento, // Ya está en formato YYYY-MM-DD
-            personal_email: formData.email,
-            phones: formData.celular.replace(/\s/g, ''), // Enviar sin espacios
-            payment_order_bank: formData.banco,
-            university_id: parseInt(formData.universidad),
-            undergraduate_major: formData.carreraProfesional,
-            with_invoice: formData.requiereFactura === 'si',
-            ruc_number: formData.ruc || undefined,
-            business_name: formData.razonSocial || undefined,
-            registered_address: formData.direccionRuc || undefined
-        }
-
-        await submitApplication(applicationData)
+// Esquema de validación con Zod
+const formSchema = z.object({
+    tipoDocumento: z.string().min(1, "Seleccione un tipo de documento"),
+    dni: z.string()
+        .min(1, "El número de documento es obligatorio")
+        .min(8, "El número de documento debe tener al menos 8 dígitos"),
+    apellidos: z.string()
+        .min(1, "Los apellidos son obligatorios")
+        .min(2, "Los apellidos deben tener al menos 2 caracteres"),
+    nombres: z.string()
+        .min(1, "Los nombres son obligatorios")
+        .min(2, "Los nombres deben tener al menos 2 caracteres"),
+    fechaNacimiento: z.string()
+        .min(1, "La fecha de nacimiento es obligatoria")
+        .refine((date) => {
+            const today = new Date()
+            const birthDate = new Date(date)
+            const age = today.getFullYear() - birthDate.getFullYear()
+            return age >= 18 && age <= 100
+        }, "Debe ser mayor de 18 años y menor de 100"),
+    email: z.string()
+        .min(1, "El email es obligatorio")
+        .email("Ingrese un email válido"),
+    celular: z.string()
+        .min(1, "El celular es obligatorio")
+        .transform((val) => val.replace(/\s/g, ''))
+        .refine((val) => val.length === 9, "El celular debe tener 9 dígitos")
+        .refine((val) => val.startsWith('9'), "El celular debe comenzar con 9"),
+    banco: z.string().min(1, "Seleccione un banco"),
+    universidad: z.string().min(1, "Seleccione una universidad"),
+    carreraProfesional: z.string()
+        .min(1, "La carrera profesional es obligatoria")
+        .min(3, "La carrera debe tener al menos 3 caracteres"),
+    requiereFactura: z.enum(["si", "no"]),
+    ruc: z.string().optional(),
+    razonSocial: z.string().optional(),
+    direccionRuc: z.string().optional(),
+}).refine((data) => {
+    if (data.tipoDocumento === "1") { // Asumiendo que 1 es DNI
+        return /^\d{8}$/.test(data.dni)
     }
+    return data.dni.length >= 8
+}, {
+    message: "Formato de documento inválido",
+    path: ["dni"]
+}).refine((data) => {
+    if (data.requiereFactura === "si") {
+        return data.ruc && /^\d{11}$/.test(data.ruc)
+    }
+    return true
+}, {
+    message: "El RUC es obligatorio y debe tener 11 dígitos",
+    path: ["ruc"]
+}).refine((data) => {
+    if (data.requiereFactura === "si") {
+        return data.razonSocial && data.razonSocial.length > 0
+    }
+    return true
+}, {
+    message: "La razón social es obligatoria",
+    path: ["razonSocial"]
+}).refine((data) => {
+    if (data.requiereFactura === "si") {
+        return data.direccionRuc && data.direccionRuc.length > 0
+    }
+    return true
+}, {
+    message: "La dirección fiscal es obligatoria",
+    path: ["direccionRuc"]
+})
 
-    const handleReset = () => {
-        setFormData({
+type FormData = z.infer<typeof formSchema>
+
+export const RegistrationForm = ({
+    universities,
+    banks,
+    program_id,
+    academic_period_id,
+    document_types
+}: Props) => {
+    const { isLoading, error, success, validationErrors, submitApplication, resetState } = useRegistrationForm()
+
+    const form = useForm<FormData>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            tipoDocumento: "",
             dni: "",
             apellidos: "",
             nombres: "",
@@ -234,8 +120,54 @@ export const RegistrationForm = ({
             ruc: "",
             razonSocial: "",
             direccionRuc: ""
-        })
-        setFieldErrors({})
+        },
+    })
+
+    const watchRequiereFactura = form.watch("requiereFactura")
+
+    // Función para formatear el celular
+    const formatCelular = (value: string) => {
+        const numbers = value.replace(/\D/g, '')
+        if (numbers.length <= 9) {
+            return numbers.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3').trim()
+        }
+        return numbers.slice(0, 9).replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3')
+    }
+
+    const onSubmit = async (data: FormData) => {
+        try {
+            const applicationData: IApplicationRequest = {
+                document_type: data.tipoDocumento,
+                document_number: data.dni,
+                program_id: program_id || 1,
+                academic_period_id: academic_period_id || 1,
+                last_name: data.apellidos,
+                first_name: data.nombres,
+                birth_date: data.fechaNacimiento,
+                personal_email: data.email,
+                phones: data.celular.replace(/\s/g, ''),
+                payment_order_bank: data.banco,
+                university_id: parseInt(data.universidad),
+                undergraduate_major: data.carreraProfesional,
+                with_invoice: data.requiereFactura === 'si',
+                ruc_number: data.ruc || undefined,
+                business_name: data.razonSocial || undefined,
+                registered_address: data.direccionRuc || undefined
+            }
+
+            await submitApplication(applicationData)
+
+            // Limpiar el formulario si se guardó exitosamente
+            if (success) {
+                form.reset()
+            }
+        } catch (error) {
+            console.error('Error al enviar formulario:', error)
+        }
+    }
+
+    const handleReset = () => {
+        form.reset()
         resetState()
     }
 
@@ -251,6 +183,39 @@ export const RegistrationForm = ({
                 </Alert>
             )}
 
+            {validationErrors && (
+                <Alert className="mb-6 border-orange-200 bg-orange-50">
+                    <AlertCircle className="h-4 w-4 text-orange-600"/>
+                    <AlertDescription className="text-orange-700">
+                        <div className="font-medium mb-2">Errores de validación:</div>
+                        <ul className="list-disc list-inside space-y-1">
+                            {Object.entries(validationErrors).map(([field, errors]) =>
+                                errors.map((error, index) => (
+                                    <li key={`${field}-${index}`} className="text-sm">
+                                        {field === 'personal_email' && error.includes('ya ha sido tomado') && (
+                                            <span className="text-red-600 font-medium">
+                                                ⚠️ El email ingresado ya está registrado para otro postulante
+                                            </span>
+                                        )}
+                                        {field === 'document_number' && error.includes('ya ha sido tomado') && (
+                                            <span className="text-red-600 font-medium">
+                                                ⚠️ El DNI ingresado ya está registrado para otro postulante
+                                            </span>
+                                        )}
+                                        {!error.includes('ya ha sido tomado') && (
+                                            <span>{error}</span>
+                                        )}
+                                    </li>
+                                ))
+                            )}
+                        </ul>
+                        <div className="mt-3 text-sm text-orange-800">
+                            💡 <strong>Sugerencia:</strong> Si ya te registraste anteriormente, contacta con administración para verificar tu estado de postulación.
+                        </div>
+                    </AlertDescription>
+                </Alert>
+            )}
+
             {success && (
                 <Alert className="mb-6 border-green-200 bg-green-50">
                     <CheckCircle className="h-4 w-4 text-green-600"/>
@@ -260,23 +225,7 @@ export const RegistrationForm = ({
                 </Alert>
             )}
 
-            {validationErrors && (
-                <Alert className="mb-6 border-orange-200 bg-orange-50">
-                    <AlertCircle className="h-4 w-4 text-orange-600"/>
-                    <AlertDescription className="text-orange-700">
-                        <div className="font-medium mb-2">Errores de validación:</div>
-                        <ul className="list-disc list-inside space-y-1">
-                            {Object.entries(validationErrors).map(([field, errors]) =>
-                                errors.map((error, index) => (
-                                    <li key={`${field}-${index}`} className="text-sm">{error}</li>
-                                ))
-                            )}
-                        </ul>
-                    </AlertDescription>
-                </Alert>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 {/* Datos Personales */}
                 <div className="border-b border-gray-200 pb-8">
                     <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
@@ -286,114 +235,121 @@ export const RegistrationForm = ({
                         Datos Personales
                     </h3>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div>
-                            <label htmlFor="dni" className="block text-sm font-medium text-gray-700 mb-2">
-                                DNI *
-                            </label>
+                            <Label htmlFor="tipoDocumento">Tipo de Documento *</Label>
+                            <Select onValueChange={(value) => form.setValue("tipoDocumento", value)} value={form.watch("tipoDocumento")}>
+                                <SelectTrigger className={`w-full ${form.formState.errors.tipoDocumento ? 'border-red-500' : ''}`}>
+                                    <SelectValue placeholder="Seleccione tipo" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {document_types?.map((tipo) => (
+                                        <SelectItem key={tipo.id} value={tipo.id.toString()}>
+                                            {tipo.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {form.formState.errors.tipoDocumento && (
+                                <p className="mt-1 text-sm text-red-600">{form.formState.errors.tipoDocumento.message}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <Label htmlFor="dni">Número de Documento *</Label>
                             <Input
                                 id="dni"
-                                name="dni"
+                                {...form.register("dni", {
+                                    onChange: (e) => {
+                                        const tipoDoc = form.watch("tipoDocumento")
+                                        if (tipoDoc === "1") { // DNI
+                                            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 8)
+                                        } else {
+                                            e.target.value = e.target.value.slice(0, 12)
+                                        }
+                                    }
+                                })}
                                 type="text"
-                                placeholder="Ingrese su DNI"
-                                value={formData.dni}
-                                onChange={handleInputChange}
-                                maxLength={8}
-                                className={`w-full ${fieldErrors.dni ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                placeholder="Ingrese su documento"
+                                className={form.formState.errors.dni ? 'border-red-500' : ''}
                             />
-                            {fieldErrors.dni && (
-                                <p className="mt-1 text-sm text-red-600">{fieldErrors.dni}</p>
+                            {form.formState.errors.dni && (
+                                <p className="mt-1 text-sm text-red-600">{form.formState.errors.dni.message}</p>
                             )}
                         </div>
 
                         <div>
-                            <label htmlFor="apellidos" className="block text-sm font-medium text-gray-700 mb-2">
-                                Apellidos *
-                            </label>
+                            <Label htmlFor="apellidos">Apellidos *</Label>
                             <Input
                                 id="apellidos"
-                                name="apellidos"
+                                {...form.register("apellidos")}
                                 type="text"
                                 placeholder="Apellidos completos"
-                                value={formData.apellidos}
-                                onChange={handleInputChange}
-                                className={`w-full ${fieldErrors.apellidos ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                className={form.formState.errors.apellidos ? 'border-red-500' : ''}
                             />
-                            {fieldErrors.apellidos && (
-                                <p className="mt-1 text-sm text-red-600">{fieldErrors.apellidos}</p>
+                            {form.formState.errors.apellidos && (
+                                <p className="mt-1 text-sm text-red-600">{form.formState.errors.apellidos.message}</p>
                             )}
                         </div>
 
                         <div>
-                            <label htmlFor="nombres" className="block text-sm font-medium text-gray-700 mb-2">
-                                Nombres *
-                            </label>
+                            <Label htmlFor="nombres">Nombres *</Label>
                             <Input
                                 id="nombres"
-                                name="nombres"
+                                {...form.register("nombres")}
                                 type="text"
                                 placeholder="Nombres completos"
-                                value={formData.nombres}
-                                onChange={handleInputChange}
-                                className={`w-full ${fieldErrors.nombres ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                className={form.formState.errors.nombres ? 'border-red-500' : ''}
                             />
-                            {fieldErrors.nombres && (
-                                <p className="mt-1 text-sm text-red-600">{fieldErrors.nombres}</p>
+                            {form.formState.errors.nombres && (
+                                <p className="mt-1 text-sm text-red-600">{form.formState.errors.nombres.message}</p>
                             )}
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                         <div>
-                            <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700 mb-2">
-                                Fecha de Nacimiento *
-                            </label>
+                            <Label htmlFor="fechaNacimiento">Fecha de Nacimiento *</Label>
                             <Input
                                 id="fechaNacimiento"
-                                name="fechaNacimiento"
+                                {...form.register("fechaNacimiento")}
                                 type="date"
-                                value={formData.fechaNacimiento}
-                                onChange={handleInputChange}
-                                className={`w-full ${fieldErrors.fechaNacimiento ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                className={form.formState.errors.fechaNacimiento ? 'border-red-500' : ''}
                             />
-                            {fieldErrors.fechaNacimiento && (
-                                <p className="mt-1 text-sm text-red-600">{fieldErrors.fechaNacimiento}</p>
+                            {form.formState.errors.fechaNacimiento && (
+                                <p className="mt-1 text-sm text-red-600">{form.formState.errors.fechaNacimiento.message}</p>
                             )}
                         </div>
 
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                                Email *
-                            </label>
+                            <Label htmlFor="email">Email *</Label>
                             <Input
                                 id="email"
-                                name="email"
+                                {...form.register("email")}
                                 type="email"
                                 placeholder="correo@ejemplo.com"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                className={`w-full ${fieldErrors.email ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                className={form.formState.errors.email ? 'border-red-500' : ''}
                             />
-                            {fieldErrors.email && (
-                                <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>
+                            {form.formState.errors.email && (
+                                <p className="mt-1 text-sm text-red-600">{form.formState.errors.email.message}</p>
                             )}
                         </div>
 
                         <div>
-                            <label htmlFor="celular" className="block text-sm font-medium text-gray-700 mb-2">
-                                Celular *
-                            </label>
+                            <Label htmlFor="celular">Celular *</Label>
                             <Input
                                 id="celular"
-                                name="celular"
+                                {...form.register("celular", {
+                                    onChange: (e) => {
+                                        e.target.value = formatCelular(e.target.value)
+                                    }
+                                })}
                                 type="tel"
                                 placeholder="999 999 999"
-                                value={formData.celular}
-                                onChange={handleInputChange}
-                                className={`w-full ${fieldErrors.celular ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                className={form.formState.errors.celular ? 'border-red-500' : ''}
                             />
-                            {fieldErrors.celular && (
-                                <p className="mt-1 text-sm text-red-600">{fieldErrors.celular}</p>
+                            {form.formState.errors.celular && (
+                                <p className="mt-1 text-sm text-red-600">{form.formState.errors.celular.message}</p>
                             )}
                         </div>
                     </div>
@@ -410,74 +366,56 @@ export const RegistrationForm = ({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label htmlFor="banco" className="block text-sm font-medium text-gray-700 mb-2">
-                                Banco *
-                            </label>
-                            <select
-                                id="banco"
-                                name="banco"
-                                value={formData.banco}
-                                onChange={handleInputChange}
-                                className={`w-full h-9 px-3 py-1 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:border-red-500 bg-white ${
-                                    fieldErrors.banco ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
-                                }`}
-                            >
-                                <option value="">Seleccione un banco</option>
-                                {banks?.map((banco) => (
-                                    <option key={banco.id} value={banco.id}>
-                                        {banco.name}
-                                    </option>
-                                ))}
-                            </select>
-                            {fieldErrors.banco && (
-                                <p className="mt-1 text-sm text-red-600">{fieldErrors.banco}</p>
+                            <Label htmlFor="banco">Banco *</Label>
+                            <Select onValueChange={(value) => form.setValue("banco", value)} value={form.watch("banco")}>
+                                <SelectTrigger className={`w-full ${form.formState.errors.banco ? 'border-red-500' : ''}`}>
+                                    <SelectValue placeholder="Seleccione un banco" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {banks?.map((banco) => (
+                                        <SelectItem key={banco.id} value={banco.id.toString()}>
+                                            {banco.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {form.formState.errors.banco && (
+                                <p className="mt-1 text-sm text-red-600">{form.formState.errors.banco.message}</p>
                             )}
                         </div>
+
                         <div>
-                            <label htmlFor="universidad" className="block text-sm font-medium text-gray-700 mb-2">
-                                Universidad *
-                            </label>
-                            <select
-                                id="universidad"
-                                name="universidad"
-                                value={formData.universidad}
-                                onChange={handleInputChange}
-                                className={`w-full h-9 px-3 py-1 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:border-red-500 bg-white ${
-                                    fieldErrors.universidad ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-red-500'
-                                }`}
-                            >
-                                <option value="">Seleccione una universidad</option>
-                                {universities?.map((universidad) => (
-                                    <option key={universidad.id} value={universidad.id}>
-                                        {universidad.name}
-                                    </option>
-                                ))}
-                            </select>
-                            {fieldErrors.universidad && (
-                                <p className="mt-1 text-sm text-red-600">{fieldErrors.universidad}</p>
+                            <Label htmlFor="universidad">Universidad *</Label>
+                            <Select onValueChange={(value) => form.setValue("universidad", value)} value={form.watch("universidad")}>
+                                <SelectTrigger className={`w-full ${form.formState.errors.universidad ? 'border-red-500' : ''}`}>
+                                    <SelectValue placeholder="Seleccione una universidad" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {universities?.map((universidad) => (
+                                        <SelectItem key={universidad.id} value={universidad.id.toString()}>
+                                            {universidad.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {form.formState.errors.universidad && (
+                                <p className="mt-1 text-sm text-red-600">{form.formState.errors.universidad.message}</p>
                             )}
                         </div>
                     </div>
 
                     <div className="mt-6">
-                        <div>
-                            <label htmlFor="carreraProfesional"
-                                   className="block text-sm font-medium text-gray-700 mb-2">
-                                Carrera Profesional *
-                            </label>
-                            <Input
-                                id="carreraProfesional"
-                                name="carreraProfesional"
-                                type="text"
-                                placeholder="Ingrese su carrera profesional"
-                                value={formData.carreraProfesional}
-                                onChange={handleInputChange}
-                                className={`w-full ${fieldErrors.carreraProfesional ? 'border-red-500 focus:ring-red-500' : ''}`}
-                            />
-                            {fieldErrors.carreraProfesional && (
-                                <p className="mt-1 text-sm text-red-600">{fieldErrors.carreraProfesional}</p>
-                            )}
-                        </div>
+                        <Label htmlFor="carreraProfesional">Carrera Profesional *</Label>
+                        <Input
+                            id="carreraProfesional"
+                            {...form.register("carreraProfesional")}
+                            type="text"
+                            placeholder="Ingrese su carrera profesional"
+                            className={form.formState.errors.carreraProfesional ? 'border-red-500' : ''}
+                        />
+                        {form.formState.errors.carreraProfesional && (
+                            <p className="mt-1 text-sm text-red-600">{form.formState.errors.carreraProfesional.message}</p>
+                        )}
                     </div>
                 </div>
 
@@ -491,89 +429,69 @@ export const RegistrationForm = ({
                     </h3>
 
                     <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-4">
-                            ¿Requiere factura? *
-                        </label>
-                        <div className="flex space-x-6">
-                            <label className="flex items-center">
-                                <input
-                                    type="radio"
-                                    name="requiereFactura"
-                                    value="si"
-                                    checked={formData.requiereFactura === "si"}
-                                    onChange={handleRadioChange}
-                                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
-                                />
-                                <span className="ml-2 text-sm text-gray-700">Sí</span>
-                            </label>
-                            <label className="flex items-center">
-                                <input
-                                    type="radio"
-                                    name="requiereFactura"
-                                    value="no"
-                                    checked={formData.requiereFactura === "no"}
-                                    onChange={handleRadioChange}
-                                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
-                                />
-                                <span className="ml-2 text-sm text-gray-700">No</span>
-                            </label>
-                        </div>
+                        <Label className="text-sm font-medium text-gray-700 mb-4">¿Requiere factura? *</Label>
+                        <RadioGroup
+                            value={form.watch("requiereFactura")}
+                            onValueChange={(value) => form.setValue("requiereFactura", value as "si" | "no")}
+                            className="flex space-x-6 mt-2"
+                        >
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="si" id="factura-si" />
+                                <Label htmlFor="factura-si">Sí</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="no" id="factura-no" />
+                                <Label htmlFor="factura-no">No</Label>
+                            </div>
+                        </RadioGroup>
                     </div>
 
-                    {formData.requiereFactura === "si" && (
+                    {watchRequiereFactura === "si" && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label htmlFor="ruc" className="block text-sm font-medium text-gray-700 mb-2">
-                                    RUC *
-                                </label>
+                                <Label htmlFor="ruc">RUC *</Label>
                                 <Input
                                     id="ruc"
-                                    name="ruc"
+                                    {...form.register("ruc", {
+                                        onChange: (e) => {
+                                            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11)
+                                        }
+                                    })}
                                     type="text"
                                     placeholder="Ingrese el RUC"
-                                    value={formData.ruc}
-                                    onChange={handleInputChange}
                                     maxLength={11}
-                                    className={`w-full ${fieldErrors.ruc ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                    className={form.formState.errors.ruc ? 'border-red-500' : ''}
                                 />
-                                {fieldErrors.ruc && (
-                                    <p className="mt-1 text-sm text-red-600">{fieldErrors.ruc}</p>
+                                {form.formState.errors.ruc && (
+                                    <p className="mt-1 text-sm text-red-600">{form.formState.errors.ruc.message}</p>
                                 )}
                             </div>
 
                             <div>
-                                <label htmlFor="razonSocial" className="block text-sm font-medium text-gray-700 mb-2">
-                                    Razón Social *
-                                </label>
+                                <Label htmlFor="razonSocial">Razón Social *</Label>
                                 <Input
                                     id="razonSocial"
-                                    name="razonSocial"
+                                    {...form.register("razonSocial")}
                                     type="text"
                                     placeholder="Ingrese la razón social"
-                                    value={formData.razonSocial}
-                                    onChange={handleInputChange}
-                                    className={`w-full ${fieldErrors.razonSocial ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                    className={form.formState.errors.razonSocial ? 'border-red-500' : ''}
                                 />
-                                {fieldErrors.razonSocial && (
-                                    <p className="mt-1 text-sm text-red-600">{fieldErrors.razonSocial}</p>
+                                {form.formState.errors.razonSocial && (
+                                    <p className="mt-1 text-sm text-red-600">{form.formState.errors.razonSocial.message}</p>
                                 )}
                             </div>
 
                             <div className="md:col-span-2">
-                                <label htmlFor="direccionRuc" className="block text-sm font-medium text-gray-700 mb-2">
-                                    Dirección asociada al RUC *
-                                </label>
+                                <Label htmlFor="direccionRuc">Dirección asociada al RUC *</Label>
                                 <Input
                                     id="direccionRuc"
-                                    name="direccionRuc"
+                                    {...form.register("direccionRuc")}
                                     type="text"
                                     placeholder="Ingrese la dirección fiscal"
-                                    value={formData.direccionRuc}
-                                    onChange={handleInputChange}
-                                    className={`w-full ${fieldErrors.direccionRuc ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                    className={form.formState.errors.direccionRuc ? 'border-red-500' : ''}
                                 />
-                                {fieldErrors.direccionRuc && (
-                                    <p className="mt-1 text-sm text-red-600">{fieldErrors.direccionRuc}</p>
+                                {form.formState.errors.direccionRuc && (
+                                    <p className="mt-1 text-sm text-red-600">{form.formState.errors.direccionRuc.message}</p>
                                 )}
                             </div>
                         </div>
@@ -585,7 +503,7 @@ export const RegistrationForm = ({
                     <Button
                         type="button"
                         variant="outline"
-                        className="px-8 py-2 border-gray-300 text-gray-700 hover:bg-gray-50"
+                        className="px-8 py-2"
                         onClick={handleReset}
                         disabled={isLoading}
                     >
@@ -593,7 +511,7 @@ export const RegistrationForm = ({
                     </Button>
                     <Button
                         type="submit"
-                        className="px-8 py-2 bg-red-800 hover:bg-red-900 text-white disabled:opacity-50"
+                        className="px-8 py-2 bg-red-800 hover:bg-red-900"
                         disabled={isLoading}
                     >
                         {isLoading ? (

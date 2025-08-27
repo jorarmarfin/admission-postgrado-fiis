@@ -1,6 +1,6 @@
 import {RegistrationForm} from "@/components";
 import {Metadata} from "next";
-import {academicPeriodService, bankService, programService, universityService} from "@/services";
+import {academicPeriodService, bankService, documentTypesService, programService, universityService} from "@/services";
 import {isValidUuid} from "@/lib/utils";
 import {notFound} from "next/navigation";
 
@@ -23,6 +23,7 @@ export default async function Page(props:{params: pageProps}) {
     const program = await programService.getProgramByUuid(slug);
     const universities = await universityService.getUniversities();
     const banks = await bankService.getBanks();
+    const documentTypes = await documentTypesService.getDocumentTypes();
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
@@ -66,6 +67,7 @@ export default async function Page(props:{params: pageProps}) {
                     banks={banks}
                     program_id={program.id}
                     academic_period_id={activePeriod.id}
+                    document_types={documentTypes}
                 />
 
                 {/* Footer */}
