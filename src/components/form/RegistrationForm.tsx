@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Loader2, CheckCircle, AlertCircle } from "lucide-react"
 import {IBank, IUniversity, IApplicationRequest, IDocumentType} from "@/interfaces"
 import { useRegistrationForm } from "@/hooks/useRegistrationForm"
@@ -155,11 +156,26 @@ export const RegistrationForm = ({
                 registered_address: data.direccionRuc || undefined
             }
 
-            await submitApplication(applicationData)
+            const wasSuccessful = await submitApplication(applicationData)
 
-            // Limpiar el formulario si se guardó exitosamente
-            if (success) {
-                form.reset()
+            // Limpiar el formulario solo si se guardó exitosamente
+            if (wasSuccessful) {
+                form.reset({
+                    tipoDocumento: "",
+                    dni: "",
+                    apellidos: "",
+                    nombres: "",
+                    fechaNacimiento: "",
+                    email: "",
+                    celular: "",
+                    banco: "",
+                    universidad: "",
+                    carreraProfesional: "",
+                    requiereFactura: "no",
+                    ruc: "",
+                    razonSocial: "",
+                    direccionRuc: ""
+                })
             }
         } catch (error) {
             console.error('Error al enviar formulario:', error)
@@ -171,9 +187,38 @@ export const RegistrationForm = ({
         resetState()
     }
 
+    const handleCloseSuccessDialog = () => {
+        resetState()
+    }
+
     return (
         <div className="bg-white rounded-b-lg shadow-sm border-x border-b border-gray-200 p-8">
-            {/* Mensajes de estado */}
+            {/* AlertDialog para éxito */}
+            <AlertDialog open={success} onOpenChange={handleCloseSuccessDialog}>
+                <AlertDialogContent className="max-w-md">
+                    <AlertDialogHeader>
+                        <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-green-100 rounded-full">
+                            <CheckCircle className="w-6 h-6 text-green-600" />
+                        </div>
+                        <AlertDialogTitle className="text-center text-lg font-semibold text-gray-900">
+                            ¡Inscripción Exitosa!
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-center text-gray-600">
+                            Tu inscripción ha sido enviada correctamente. Recibirás un correo electrónico de confirmación con los detalles de tu registro.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogAction
+                            className="w-full bg-green-600 hover:bg-green-700 text-white"
+                            onClick={handleCloseSuccessDialog}
+                        >
+                            Entendido
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Mensajes de estado - solo errores */}
             {error && (
                 <Alert className="mb-6 border-red-200 bg-red-50">
                     <AlertCircle className="h-4 w-4 text-red-600"/>
@@ -212,15 +257,6 @@ export const RegistrationForm = ({
                         <div className="mt-3 text-sm text-orange-800">
                             💡 <strong>Sugerencia:</strong> Si ya te registraste anteriormente, contacta con administración para verificar tu estado de postulación.
                         </div>
-                    </AlertDescription>
-                </Alert>
-            )}
-
-            {success && (
-                <Alert className="mb-6 border-green-200 bg-green-50">
-                    <CheckCircle className="h-4 w-4 text-green-600"/>
-                    <AlertDescription className="text-green-700">
-                        ¡Inscripción enviada exitosamente! Recibirás un correo de confirmación.
                     </AlertDescription>
                 </Alert>
             )}
