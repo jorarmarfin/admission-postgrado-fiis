@@ -13,6 +13,11 @@ export interface IApplicationRequest {
     birth_date: string;
     university_id: number;
     undergraduate_major: string;
+    with_invoice:boolean;
+    ruc_number?: string;
+    business_name?: string;
+    business_address?: string;
+    registered_address?: string;
 }
 
 export interface IApplicantData {

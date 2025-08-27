@@ -19,12 +19,8 @@ export const applicantService = {
                 body: JSON.stringify(applicationData)
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                return errorData as IApplicationResponse;
-            }
-
             const data = await response.json();
+
             return data as IApplicationResponse;
         } catch (error) {
             console.error('Error al enviar la aplicación:', error);
