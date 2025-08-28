@@ -4,3 +4,4 @@ export { universityService } from './laravel/University.service';
 export { applicantService } from './laravel/Applicant.service';
 export { bankService } from './laravel/Bank.service';
 export { documentTypesService } from './laravel/DocumentTypes.service';
+export { loginService } from './laravel/Login.service';
