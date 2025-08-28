@@ -3,3 +3,5 @@ export {DocumentsUploadForm} from "@/components/form/DocumentsUploadForm";
 export {RegistrationForm} from "@/components/form/RegistrationForm";
 export {Login} from "@/components/auths/login";
 export {AuthProvider} from "@/components/auths/auth-provider";
+export {LogoutButton} from "@/components/auths/logout-button";
+export {UserDashboard} from "@/components/auths/user-dashboard";

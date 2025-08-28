@@ -1,5 +1,6 @@
 import Link from "next/link";
-import React from "react"; // Importa el componente Image
+import React from "react";
+import {LogoutButton} from "@/components"; // Importa el componente Image
 
 export default function IntranetLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -32,13 +33,18 @@ export default function IntranetLayout({ children }: { children: React.ReactNode
                         </div>
 
                         {/* Navegación */}
-                        <nav className="hidden md:flex space-x-6">
+                        <nav className="hidden md:flex items-center space-x-6">
                             <Link href="/" className="text-gray-700 hover:text-red-800 font-medium transition-colors">
                                 Inicio
                             </Link>
-                            <Link href="/auth/login" className="text-red-800 hover:text-red-900 font-medium transition-colors">
-                                Salir
+                            <Link href="/" className="text-gray-700 hover:text-red-800 font-medium transition-colors">
+                                Descargar Documentos
                             </Link>
+                            <div className="border-l border-gray-300 pl-6">
+                                <LogoutButton className='bg-red-800 text-white
+                                hover:bg-red-500 hover:text-white
+                                cursor-pointer'/>
+                            </div>
                         </nav>
 
                         {/* Menu móvil */}
