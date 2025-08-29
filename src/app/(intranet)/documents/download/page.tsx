@@ -3,8 +3,16 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+// import {Metadata} from "next";
+//
+// export const metadata: Metadata = {
+//     title: "Descargar Documentos - Admisión Postgrado",
+//     description: "Página para descargar documentos necesarios para el proceso de admisión al postgrado de la FIIS - UNI.",
+// }
+
 
 export default function DocumentsDownloadPage() {
+
     // Datos seteados que después vendrán de una API
     const documentos = [
         {
@@ -77,18 +85,6 @@ export default function DocumentsDownloadPage() {
 
     const [descargando, setDescargando] = useState<number | null>(null)
 
-    const handleDescargar = async (documento: any) => {
-        setDescargando(documento.id)
-        // Simular descarga - aquí iría la lógica real de descarga
-        setTimeout(() => {
-            // En un caso real, aquí se iniciaría la descarga del archivo
-            const link = document.createElement('a')
-            link.href = documento.url
-            link.download = `${documento.titulo.replace(/\s+/g, '-').toLowerCase()}.pdf`
-            link.click()
-            setDescargando(null)
-        }, 1500)
-    }
 
     const getIcono = (tipo: string) => {
         switch (tipo) {
@@ -262,7 +258,7 @@ export default function DocumentsDownloadPage() {
 
                                             <div className="flex-shrink-0 ml-4">
                                                 <Button
-                                                    onClick={() => handleDescargar(documento)}
+                                                    // onClick={() => handleDescargar(documento)}
                                                     disabled={descargando === documento.id}
                                                     className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
                                                 >

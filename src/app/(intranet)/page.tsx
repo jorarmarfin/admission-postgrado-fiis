@@ -3,6 +3,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {academicPeriodService} from "@/services";
 import {Metadata} from "next";
+import {authOptions} from "@/lib/auth";
+import {getServerSession} from "next-auth";
 
 export const metadata: Metadata = {
     title: "Panel de Admisión",
@@ -12,10 +14,12 @@ export const metadata: Metadata = {
 
 export default async function Home() {
     const activePeriod = await academicPeriodService.getActivePeriod();
+    const session = await getServerSession(authOptions);
     // Datos del postulante (puedes reemplazar con datos reales)
-  const postulante = {
-    nombre: "Luis Mayta"
-  }
+    const postulante = {
+        nombre: session?.user?.name || "Usuario",
+        email: session?.user?.email
+    }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
