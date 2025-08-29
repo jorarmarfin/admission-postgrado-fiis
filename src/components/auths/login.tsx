@@ -32,6 +32,7 @@ export const Login = () => {
                 router.refresh();
             }
         } catch (error) {
+            console.error("Error durante el login:", error);
             setError("Ocurrió un error durante el inicio de sesión. Inténtalo más tarde.");
         } finally {
             setIsLoading(false);

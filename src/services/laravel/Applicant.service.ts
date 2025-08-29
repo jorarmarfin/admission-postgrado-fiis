@@ -1,4 +1,4 @@
-import { IApplicationRequest, IApplicationResponse, IUserApplicationsResponse } from "@/interfaces";
+import { IApplicationRequest, IApplicationResponse, IUserApplicationsResponse, IProgramDocumentsResponse, IUploadDocumentResponse } from "@/interfaces";
 
 const SERVER_BASE = process.env.NEXT_BACKEND_API_URL;            // solo server
 const CLIENT_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -59,6 +59,72 @@ export const applicantService = {
         } catch (error) {
             console.error('Error al obtener las aplicaciones del usuario:', error);
             throw new Error('Error al cargar las aplicaciones del usuario');
+        }
+    },
+
+    /**
+     * Obtiene los documentos de un programa específico
+     * @param programId - ID del programa
+     * @param token - Token de autorización Bearer
+     * @returns Promise con los documentos del programa
+     */
+    async getProgramDocuments(programId: number, token: string): Promise<IProgramDocumentsResponse> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admission/programs/${programId}/documents`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                cache: 'no-store'
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            return data as IProgramDocumentsResponse;
+        } catch (error) {
+            console.error('Error al obtener los documentos del programa:', error);
+            throw new Error('Error al cargar los documentos del programa');
+        }
+    },
+
+    /**
+     * Sube un documento del solicitante
+     * @param file - Archivo a subir
+     * @param documentName - Nombre del documento
+     * @param token - Token de autorización Bearer
+     * @returns Promise con la respuesta de la subida
+     */
+    async uploadDocument(file: File, documentName: string, token: string): Promise<IUploadDocumentResponse> {
+        try {
+            const formData = new FormData();
+            formData.append('document', file);
+            formData.append('document_name', documentName);
+
+            const response = await fetch(`${API_BASE_URL}/admission/applicant/documents`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            return data as IUploadDocumentResponse;
+        } catch (error) {
+            console.error('Error al subir el documento:', error);
+            throw new Error('Error al subir el documento');
         }
     }
 };

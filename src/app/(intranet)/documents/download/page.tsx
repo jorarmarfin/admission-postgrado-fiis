@@ -1,100 +1,38 @@
-"use client"
 
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-// import {Metadata} from "next";
-//
-// export const metadata: Metadata = {
-//     title: "Descargar Documentos - Admisión Postgrado",
-//     description: "Página para descargar documentos necesarios para el proceso de admisión al postgrado de la FIIS - UNI.",
-// }
+import {Metadata} from "next";
+import {authOptions} from "@/lib/auth";
+import {getServerSession} from "next-auth";
+import {applicantService, programService} from "@/services";
+import {IProgramDocumentsResponse, IUserApplicationsResponse} from "@/interfaces";
+
+export const metadata: Metadata = {
+    title: "Descargar Documentos - Admisión Postgrado",
+    description: "Página para descargar documentos necesarios para el proceso de admisión al postgrado de la FIIS - UNI.",
+}
 
 
-export default function DocumentsDownloadPage() {
+export default async function DocumentsDownloadPage() {
+    const session = await getServerSession(authOptions);
+    const token = session?.accessToken ?? '';
+    const userId = session?.user?.id ?? '';
 
-    // Datos seteados que después vendrán de una API
-    const documentos = [
-        {
-            id: 1,
-            titulo: "Guía del Postulante 2026-1",
-            descripcion: "Manual completo con toda la información necesaria para el proceso de admisión.",
-            tipo: "PDF",
-            tamaño: "2.3 MB",
-            fechaActualizacion: "15 Diciembre 2024",
-            url: "/downloads/guia-postulante-2026-1.pdf",
-            icono: "document",
-            categoria: "guia"
-        },
-        {
-            id: 2,
-            titulo: "Formato de Inscripción",
-            descripcion: "Formulario oficial de inscripción que debe ser completado y presentado.",
-            tipo: "PDF",
-            tamaño: "850 KB",
-            fechaActualizacion: "10 Diciembre 2024",
-            url: "/downloads/formato-inscripcion.pdf",
-            icono: "form",
-            categoria: "formato"
-        },
-        {
-            id: 3,
-            titulo: "Lista de Requisitos Académicos",
-            descripcion: "Documentos académicos requeridos según el programa de postgrado.",
-            tipo: "PDF",
-            tamaño: "1.1 MB",
-            fechaActualizacion: "12 Diciembre 2024",
-            url: "/downloads/requisitos-academicos.pdf",
-            icono: "list",
-            categoria: "requisitos"
-        },
-        {
-            id: 4,
-            titulo: "Cronograma del Proceso",
-            descripcion: "Calendario detallado con todas las fechas importantes del proceso de admisión.",
-            tipo: "PDF",
-            tamaño: "780 KB",
-            fechaActualizacion: "18 Diciembre 2024",
-            url: "/downloads/cronograma-admision.pdf",
-            icono: "calendar",
-            categoria: "cronograma"
-        },
-        {
-            id: 5,
-            titulo: "Temario de Examen",
-            descripcion: "Contenidos y temas que serán evaluados en el examen de admisión.",
-            tipo: "PDF",
-            tamaño: "1.5 MB",
-            fechaActualizacion: "20 Diciembre 2024",
-            url: "/downloads/temario-examen.pdf",
-            icono: "book",
-            categoria: "examen"
-        },
-        {
-            id: 6,
-            titulo: "Formato de Declaración Jurada",
-            descripcion: "Documento de declaración jurada que debe ser firmado por el postulante.",
-            tipo: "PDF",
-            tamaño: "650 KB",
-            fechaActualizacion: "08 Diciembre 2024",
-            url: "/downloads/declaracion-jurada.pdf",
-            icono: "certificate",
-            categoria: "formato"
-        }
-    ]
+    // @ts-expect-error
+    const applicantData:IUserApplicationsResponse = await applicantService.getUserApplications(userId,token);
+    const documents:IProgramDocumentsResponse = await programService.getProgramDocuments(applicantData.data[0].program.id,token);
 
-    const [descargando, setDescargando] = useState<number | null>(null)
 
 
     const getIcono = (tipo: string) => {
         switch (tipo) {
-            case "document":
+            case "docx":
                 return (
                     <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                 )
-            case "form":
+            case "pdf":
                 return (
                     <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -151,10 +89,10 @@ export default function DocumentsDownloadPage() {
                                     Documentos para Descarga
                                 </h1>
                                 <p className="text-lg text-gray-600">
-                                    Proceso de Admisión Postgrado 2026-1
+                                    Proceso de Admisión Postgrado {applicantData?.data[0].academic_period.name}
                                 </p>
                                 <p className="text-sm text-gray-500">
-                                    Universidad Nacional de Ingeniería - FIIS
+                                    {applicantData?.data[0].program.name}
                                 </p>
                             </div>
                         </div>
@@ -215,21 +153,21 @@ export default function DocumentsDownloadPage() {
                     </h2>
 
                     <div className="grid gap-6">
-                        {documentos.map((documento) => (
-                            <div key={documento.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200">
+                        {documents.data.map((document) => (
+                            <div key={document.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200">
                                 <div className="flex items-start space-x-4">
                                     <div className="flex-shrink-0">
-                                        {getIcono(documento.icono)}
+                                        {getIcono(document.document_type)}
                                     </div>
 
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between">
                                             <div className="flex-1">
                                                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                                    {documento.titulo}
+                                                    {document.document_name}
                                                 </h3>
                                                 <p className="text-gray-600 mb-3">
-                                                    {documento.descripcion}
+                                                    Descripción
                                                 </p>
 
                                                 <div className="flex items-center space-x-6 text-sm text-gray-500">
@@ -237,44 +175,35 @@ export default function DocumentsDownloadPage() {
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                                         </svg>
-                                                        <span>{documento.tipo}</span>
+                                                        <span>{document.document_type}</span>
                                                     </div>
 
                                                     <div className="flex items-center space-x-1">
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                                         </svg>
-                                                        <span>{documento.tamaño}</span>
+                                                        <span>{document.document_size}</span>
                                                     </div>
 
                                                     <div className="flex items-center space-x-1">
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                         </svg>
-                                                        <span>Actualizado: {documento.fechaActualizacion}</span>
+                                                        <span>Actualizado: {new Date(document.created_at).toLocaleString('es-ES')}</span>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div className="flex-shrink-0 ml-4">
                                                 <Button
-                                                    // onClick={() => handleDescargar(documento)}
-                                                    disabled={descargando === documento.id}
                                                     className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
                                                 >
-                                                    {descargando === documento.id ? (
-                                                        <div className="flex items-center space-x-2">
-                                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                                            <span>Descargando...</span>
-                                                        </div>
-                                                    ) : (
-                                                        <div className="flex items-center space-x-2">
-                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                            </svg>
-                                                            <span>Descargar</span>
-                                                        </div>
-                                                    )}
+                                                    <div className="flex items-center space-x-2">
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                        </svg>
+                                                        <span>Descargar</span>
+                                                    </div>
                                                 </Button>
                                             </div>
                                         </div>
