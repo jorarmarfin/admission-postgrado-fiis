@@ -9,7 +9,7 @@ interface PublicRouteProps {
 }
 
 export const PublicRoute = ({ children }: PublicRouteProps) => {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const isAuthenticated = status === "authenticated";
   const isLoading = status === "loading";

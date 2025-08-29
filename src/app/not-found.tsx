@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {Metadata} from "next";
+import {Image404, LogoUni} from "@/components";
 
 export const metadata:Metadata = {
     title: "Página no encontrada - UNI FIIS",
@@ -15,25 +16,14 @@ export default function NoFound() {
                     {/* Logo/Imagen placeholder */}
                     <div className="mb-8 flex justify-center">
                         <div className="w-24 h-24 rounded-full flex items-center justify-center shadow-lg overflow-hidden bg-white">
-                            <img
-                                src="/images/logo-uni.png"
-                                alt="Logo UNI"
-                                width={96}
-                                height={96}
-                                className="object-contain w-full h-full"
-                            />
+                            <LogoUni/>
                         </div>
                     </div>
 
                     {/* Espacio reservado para imagen personalizada */}
                     <div className="mb-8">
                         <div className="w-32 mx-auto rounded-lg flex items-center justify-center overflow-hidden">
-                            <img
-                                src="/images/404.jpg"
-                                alt="Imagen de error 404"
-                                width={100}
-                                className="object-cover w-full h-full"
-                            />
+                            <Image404 />
                         </div>
                     </div>
 

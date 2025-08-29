@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import {LogoutButton} from "@/components"; // Importa el componente Image
+import {LogoUni, LogoutButton} from "@/components"; // Importa el componente Image
 
 export default function IntranetLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -13,13 +13,7 @@ export default function IntranetLayout({ children }: { children: React.ReactNode
                         <div className="flex items-center space-x-4">
                             {/* Sustituye el logo por la imagen */}
                             <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center bg-white border border-gray-200">
-                                <img
-                                    src="/images/logo-uni.png"
-                                    alt="Logo UNI"
-                                    width={64}
-                                    height={64}
-                                    className="w-14 h-14 object-contain rounded-full"
-                                />
+                                <LogoUni/>
                             </div>
                             <div>
                                 <h1 className="text-xl font-bold text-red-800">

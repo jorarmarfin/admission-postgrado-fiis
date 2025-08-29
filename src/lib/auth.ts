@@ -1,7 +1,14 @@
 import CredentialsProvider from "next-auth/providers/credentials";
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, User } from "next-auth";
 import { loginService } from "@/services";
+import { IUser } from "@/interfaces";
 
+
+interface AuthUser extends User {
+    token: string;
+    roles: string[];
+    userData: IUser;
+}
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -48,10 +55,11 @@ export const authOptions: NextAuthOptions = {
         async jwt({ token, user }) {
             // Persiste la información del usuario en el JWT
             if (user) {
-                token.accessToken = (user as any).token;
-                token.roles = (user as any).roles;
+                const authUser = user as AuthUser;
+                token.accessToken = authUser.token;
+                token.roles = authUser.roles;
                 token.userId = user.id;
-                token.userData = (user as any).userData;
+                token.userData = authUser.userData;
             }
             return token;
         },
@@ -62,7 +70,7 @@ export const authOptions: NextAuthOptions = {
                 session.user.roles = token.roles as string[];
             }
             session.accessToken = token.accessToken as string;
-            session.userData = token.userData as any;
+            session.userData = token.userData as IUser;
             return session;
         },
     },
