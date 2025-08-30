@@ -12,8 +12,10 @@ interface DocumentoSubido {
     fechaSubida: string
     archivo: File
 }
-
-export const DocumentsUploadForm = () => {
+interface Props{
+    token: string
+}
+export const DocumentsUploadForm = ({token}:Props) => {
     const [documentos, setDocumentos] = useState<DocumentoSubido[]>([])
     const [subiendo, setSubiendo] = useState(false)
     const [draggedOver, setDraggedOver] = useState(false)

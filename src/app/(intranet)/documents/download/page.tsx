@@ -3,7 +3,7 @@ import Link from "next/link"
 import {Metadata} from "next";
 import {authOptions} from "@/lib/auth";
 import {getServerSession} from "next-auth";
-import {applicantService} from "@/services";
+import {applicantService, programService} from "@/services";
 import {IProgramDocumentsResponse, IUserApplicationsResponse} from "@/interfaces";
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export default async function DocumentsDownloadPage() {
 
     // Convertir userId de string a number ya que el API espera number
     const applicantData: IUserApplicationsResponse = await applicantService.getUserApplications(parseInt(userId), token);
-    const documents: IProgramDocumentsResponse = await applicantService.getProgramDocuments(applicantData.data[0].program.id, token);
+    const documents: IProgramDocumentsResponse = await programService.getProgramDocuments(applicantData.data[0].program.id, token);
 
 
 

@@ -63,37 +63,6 @@ export const applicantService = {
     },
 
     /**
-     * Obtiene los documentos de un programa específico
-     * @param programId - ID del programa
-     * @param token - Token de autorización Bearer
-     * @returns Promise con los documentos del programa
-     */
-    async getProgramDocuments(programId: number, token: string): Promise<IProgramDocumentsResponse> {
-        try {
-            const response = await fetch(`${API_BASE_URL}/admission/programs/${programId}/documents`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                cache: 'no-store'
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            return data as IProgramDocumentsResponse;
-        } catch (error) {
-            console.error('Error al obtener los documentos del programa:', error);
-            throw new Error('Error al cargar los documentos del programa');
-        }
-    },
-
-    /**
      * Sube un documento del solicitante
      * @param file - Archivo a subir
      * @param documentName - Nombre del documento
