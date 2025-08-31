@@ -1,4 +1,4 @@
-import { IApplicationRequest, IApplicationResponse, IUserApplicationsResponse, IProgramDocumentsResponse, IUploadDocumentResponse, IApplicantDocumentsResponse } from "@/interfaces";
+import { IApplicationRequest, IApplicationResponse, IUserApplicationsResponse, IUploadDocumentResponse, IApplicantDocumentsResponse } from "@/interfaces";
 
 const SERVER_BASE = process.env.NEXT_BACKEND_API_URL;            // solo server
 const CLIENT_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -124,6 +124,36 @@ export const applicantService = {
         } catch (error) {
             console.error('Error al obtener los documentos del solicitante:', error);
             throw new Error('Error al cargar los documentos del solicitante');
+        }
+    },
+
+    /**
+     * Elimina un documento del solicitante
+     * @param documentId - ID del documento a eliminar
+     * @param token - Token de autorización Bearer
+     * @returns Promise con la respuesta de la eliminación
+     */
+    async deleteDocument(documentId: number, token: string): Promise<{status: string, message: string}> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admission/applicant/documents/${documentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            return data as {status: string, message: string};
+        } catch (error) {
+            console.error('Error al eliminar el documento:', error);
+            throw new Error('Error al eliminar el documento');
         }
     }
 };

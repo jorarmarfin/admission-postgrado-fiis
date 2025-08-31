@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { applicantService } from '@/services/laravel/Applicant.service';
-import { IUploadDocumentResponse, IApplicantDocument } from '@/interfaces';
+import { IUploadDocumentResponse } from '@/interfaces';
 
 interface AlertDialogState {
     isOpen: boolean;
@@ -65,26 +65,16 @@ export const useApplicantDocuments = (token: string): UseApplicantDocumentsRetur
         });
     }, [setAlertDialog]);
 
-    const showConfirmDialog = useCallback((title: string, description: string, onConfirm: () => void) => {
-        setAlertDialog({
-            isOpen: true,
-            title,
-            description,
-            type: 'confirm',
-            onConfirm,
-            onCancel: closeAlertDialog
-        });
-    }, [setAlertDialog, closeAlertDialog]);
 
     const subirDocumento = useCallback(async (file: File, documentName: string): Promise<IUploadDocumentResponse> => {
         try {
-            const response = await applicantService.uploadDocument(file, documentName, token);
+            const response: IUploadDocumentResponse = await applicantService.uploadDocument(file, documentName, token);
             return response;
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error al subir documento:', error);
 
             // Mostrar error específico del backend
-            if (error.message && error.message.includes('validation')) {
+            if (error instanceof Error && error.message && error.message.includes('validation')) {
                 throw new Error('Formato de archivo no válido. Solo se aceptan archivos PDF, JPG, JPEG y PNG.');
             }
 
@@ -128,12 +118,12 @@ export const useApplicantDocuments = (token: string): UseApplicantDocumentsRetur
                     const documentName = file.name.split('.')[0];
                     await subirDocumento(file, documentName);
                     uploadedCount++;
-                } catch (error: any) {
+                } catch (error: unknown) {
                     errorCount++;
                     console.error(`Error al subir ${file.name}:`, error);
 
                     // Capturar errores específicos del backend
-                    if (error.message.includes('validation')) {
+                    if (error instanceof Error && error.message.includes('validation')) {
                         errorDetails.push(`${file.name}: Formato no válido`);
                     } else {
                         errorDetails.push(`${file.name}: Error al subir`);
@@ -182,10 +172,23 @@ export const useApplicantDocuments = (token: string): UseApplicantDocumentsRetur
         handleFileSelect(e.dataTransfer.files, onSuccess);
     }, [handleFileSelect]);
 
-    const eliminarDocumento = useCallback((id: number) => {
-        // TODO: Implementar eliminación de documento
-        console.log('Eliminar documento:', id);
-    }, []);
+    const eliminarDocumento = useCallback(async (id: number) => {
+        try {
+            const response = await applicantService.deleteDocument(id, token);
+            if (response.status === 'success') {
+                showSuccessDialog('Documento eliminado', response.message);
+            } else {
+                showErrorDialog('Error al eliminar', response.message || 'No se pudo eliminar el documento.');
+            }
+        } catch (error: unknown) {
+            console.error('Error al eliminar documento:', error);
+            if (error instanceof Error) {
+                showErrorDialog('Error al eliminar', error.message);
+            } else {
+                showErrorDialog('Error al eliminar', 'No se pudo eliminar el documento.');
+            }
+        }
+    }, [token, showSuccessDialog, showErrorDialog]);
 
     return {
         subiendo,
