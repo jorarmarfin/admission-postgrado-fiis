@@ -172,10 +172,23 @@ export const useApplicantDocuments = (token: string): UseApplicantDocumentsRetur
         handleFileSelect(e.dataTransfer.files, onSuccess);
     }, [handleFileSelect]);
 
-    const eliminarDocumento = useCallback((id: number) => {
-        // TODO: Implementar eliminación de documento
-        console.log('Eliminar documento:', id);
-    }, []);
+    const eliminarDocumento = useCallback(async (id: number) => {
+        try {
+            const response = await applicantService.deleteDocument(id, token);
+            if (response.status === 'success') {
+                showSuccessDialog('Documento eliminado', response.message);
+            } else {
+                showErrorDialog('Error al eliminar', response.message || 'No se pudo eliminar el documento.');
+            }
+        } catch (error: unknown) {
+            console.error('Error al eliminar documento:', error);
+            if (error instanceof Error) {
+                showErrorDialog('Error al eliminar', error.message);
+            } else {
+                showErrorDialog('Error al eliminar', 'No se pudo eliminar el documento.');
+            }
+        }
+    }, [token, showSuccessDialog, showErrorDialog]);
 
     return {
         subiendo,

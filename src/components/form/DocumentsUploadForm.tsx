@@ -27,6 +27,7 @@ export const DocumentsUploadForm = ({token, documents: initialDocuments}:Props) 
     const router = useRouter()
     const [documents, setDocuments] = useState<IApplicantDocument[]>(initialDocuments)
     const [refreshing, setRefreshing] = useState(false)
+    const [eliminandoId, setEliminandoId] = useState<number | null>(null)
 
     const refreshDocuments = useCallback(async () => {
         setRefreshing(true)
@@ -54,8 +55,16 @@ export const DocumentsUploadForm = ({token, documents: initialDocuments}:Props) 
     } = useApplicantDocuments(token);
 
     const handleSuccessfulUpload = useCallback(() => {
-        refreshDocuments()
+        refreshDocuments().then();
     }, [refreshDocuments])
+
+    // Función extraída para borrar documento
+    const handleDelete = async (id: number) => {
+        setEliminandoId(id);
+        await eliminarDocumento(id);
+        setEliminandoId(null);
+        refreshDocuments();
+    };
 
     const getTipoIcon = (fileIcon: string) => {
         if (fileIcon === 'document-text' || fileIcon.includes('pdf')) {
@@ -181,7 +190,6 @@ export const DocumentsUploadForm = ({token, documents: initialDocuments}:Props) 
                                        <h3 className="font-medium text-gray-900 truncate flex items-center">
                                            {document.name}
                                        </h3>
-
                                        <div className="flex items-center space-x-4 text-sm text-gray-500">
                                            <span>{document.file_size}</span>
                                            <span>•</span>
@@ -189,7 +197,6 @@ export const DocumentsUploadForm = ({token, documents: initialDocuments}:Props) 
                                        </div>
                                    </div>
                                </div>
-
                                <div className="flex items-center space-x-2">
                                    <Button
                                        variant="outline"
@@ -212,19 +219,23 @@ export const DocumentsUploadForm = ({token, documents: initialDocuments}:Props) 
                                    <Button
                                        variant="outline"
                                        size="sm"
-                                       onClick={() => eliminarDocumento(document.id)}
+                                       onClick={() => handleDelete(document.id)}
                                        className="border-red-300 text-red-600 hover:bg-red-50"
+                                       disabled={eliminandoId === document.id}
                                    >
-                                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                       </svg>
+                                       {eliminandoId === document.id ? (
+                                           <div className="w-4 h-4 mr-1 animate-spin rounded-full border-b-2 border-red-600"></div>
+                                       ) : (
+                                           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                           </svg>
+                                       )}
                                        Eliminar
                                    </Button>
                                </div>
                            </div>
                        ))}
                    </div>
-
                    {/* Acciones finales */}
                    <div className="flex justify-center space-x-4 mt-8 pt-6 border-t border-gray-200">
                        <Link href="/interview">
