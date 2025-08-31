@@ -2,7 +2,7 @@ import {DocumentsUploadForm} from "@/components";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/lib/auth";
 import {Metadata} from "next";
-import {IUserApplicationsResponse} from "@/interfaces";
+import {IApplicantDocumentsResponse, IUserApplicationsResponse} from "@/interfaces";
 import {applicantService} from "@/services";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
@@ -17,6 +17,8 @@ export default async function DocumentsUploadPage() {
     const token = session?.accessToken ?? '';
     const userId = session?.user?.id ?? '';
     const applicantData: IUserApplicationsResponse = await applicantService.getUserApplications(parseInt(userId), token);
+    const applicantDocuments:IApplicantDocumentsResponse = await applicantService.getApplicantDocuments(token);
+    console.log('Applicant Documents:', applicantDocuments.data);
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
             <div className="max-w-4xl mx-auto">
@@ -52,7 +54,10 @@ export default async function DocumentsUploadPage() {
                     </div>
 
                 </div>
-                <DocumentsUploadForm token={token} />
+                <DocumentsUploadForm
+                    token={token}
+                    documents={applicantDocuments.data}
+                />
 
 
                 {/* Footer informativo */}

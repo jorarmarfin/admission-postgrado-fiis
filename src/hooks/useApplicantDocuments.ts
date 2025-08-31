@@ -41,7 +41,6 @@ interface UseApplicantDocumentsReturn {
 }
 
 export const useApplicantDocuments = (token: string): UseApplicantDocumentsReturn => {
-    const [documentos, setDocumentos] = useState<DocumentoSubido[]>([]);
     const [subiendo, setSubiendo] = useState(false);
     const [draggedOver, setDraggedOver] = useState(false);
     const [alertDialog, setAlertDialogState] = useState<AlertDialogState>({
@@ -129,20 +128,12 @@ export const useApplicantDocuments = (token: string): UseApplicantDocumentsRetur
             const uploadPromise = subirDocumento(file, file.name.split('.')[0])
                 .then((response) => {
                     // Actualizar documento con respuesta de subida exitosa
-                    setDocumentos(prev => prev.map(doc =>
-                        doc.id === nuevoDocumento.id
-                            ? { ...doc, uploaded: true, uploadResponse: response }
-                            : doc
-                    ));
+
                 })
                 .catch((error) => {
                     console.error(`Error al subir ${file.name}:`, error);
                     // Marcar documento con error pero mantenerlo en la lista
-                    setDocumentos(prev => prev.map(doc =>
-                        doc.id === nuevoDocumento.id
-                            ? { ...doc, uploaded: false }
-                            : doc
-                    ));
+
                     showErrorDialog(
                         'Error al subir documento',
                         `No se pudo subir el documento "${file.name}". Por favor, inténtalo de nuevo.`
@@ -152,8 +143,6 @@ export const useApplicantDocuments = (token: string): UseApplicantDocumentsRetur
             uploadPromises.push(uploadPromise);
         }
 
-        // Agregar documentos a la lista inmediatamente
-        setDocumentos(prev => [...prev, ...nuevosDocumentos]);
 
         try {
             // Esperar a que todas las subidas terminen
@@ -180,22 +169,10 @@ export const useApplicantDocuments = (token: string): UseApplicantDocumentsRetur
     }, [handleFileSelect]);
 
     const eliminarDocumento = useCallback((id: number) => {
-        setDocumentos(prev => prev.filter(doc => doc.id !== id));
+
     }, []);
 
-    const limpiarTodos = useCallback(() => {
-        showConfirmDialog(
-            'Confirmar eliminación',
-            '¿Estás seguro de que deseas eliminar todos los documentos? Esta acción no se puede deshacer.',
-            () => {
-                setDocumentos([]);
-                closeAlertDialog();
-            }
-        );
-    }, [showConfirmDialog, closeAlertDialog]);
-
     return {
-        documentos,
         subiendo,
         draggedOver,
         form,
@@ -207,7 +184,6 @@ export const useApplicantDocuments = (token: string): UseApplicantDocumentsRetur
         handleDragLeave,
         handleDrop,
         eliminarDocumento,
-        limpiarTodos,
         subirDocumento
     };
 };

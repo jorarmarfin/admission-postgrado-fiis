@@ -29,3 +29,21 @@ export interface IUploadDocumentResponse {
         document_name: string;
     };
 }
+
+// Interface para un documento del solicitante
+export interface IApplicantDocument {
+    id: number;
+    name: string;
+    file: string;
+    file_url: string;
+    file_size: string;
+    file_type: string;
+    upload_date: string | null;
+    applicant_id: number;
+}
+
+// Interface para la respuesta de documentos del solicitante
+export interface IApplicantDocumentsResponse {
+    status: string;
+    data: IApplicantDocument[];
+}

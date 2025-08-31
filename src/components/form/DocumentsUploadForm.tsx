@@ -14,13 +14,14 @@ import {
 } from "@/components/ui/alert-dialog"
 import Link from "next/link"
 import { useApplicantDocuments } from "@/hooks/useApplicantDocuments"
+import {IApplicantDocument} from "@/interfaces";
 
 interface Props{
-    token: string
+    token: string,
+    documents: IApplicantDocument[]
 }
-export const DocumentsUploadForm = ({token}:Props) => {
+export const DocumentsUploadForm = ({token,documents}:Props) => {
     const {
-        documentos,
         subiendo,
         draggedOver,
         alertDialog,
@@ -30,7 +31,6 @@ export const DocumentsUploadForm = ({token}:Props) => {
         handleDragLeave,
         handleDrop,
         eliminarDocumento,
-        limpiarTodos
     } = useApplicantDocuments(token);
 
     const getTipoIcon = (tipo: string) => {
@@ -118,64 +118,39 @@ export const DocumentsUploadForm = ({token}:Props) => {
            </div>
 
            {/* Lista de documentos */}
-           {documentos.length > 0 && (
+           {documents.length > 0 && (
                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
                    <div className="flex items-center justify-between mb-6">
                        <h2 className="text-xl font-bold text-gray-900">
-                           Documentos ({documentos.length})
+                           Documentos ({documents.length})
                        </h2>
-                       <Button
-                           variant="outline"
-                           onClick={limpiarTodos}
-                           className="border-red-300 text-red-600 hover:bg-red-50"
-                       >
-                           Limpiar Todo
-                       </Button>
                    </div>
 
                    <div className="space-y-4">
-                       {documentos.map((documento) => (
-                           <div key={documento.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                       {documents.map((document) => (
+                           <div key={document.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                                <div className="flex items-center space-x-4">
                                    <div className="flex-shrink-0">
-                                       {getTipoIcon(documento.tipo)}
+                                       {getTipoIcon(document.file_type)}
                                    </div>
                                    <div className="flex-1 min-w-0">
                                        <h3 className="font-medium text-gray-900 truncate flex items-center">
-                                           {documento.nombre}
-                                           {documento.uploaded === true && (
-                                               <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                   <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                                   </svg>
-                                                   Subido
-                                               </span>
-                                           )}
-                                           {documento.uploaded === false && documento.uploaded !== undefined && (
-                                               <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                   <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                       <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                                   </svg>
-                                                   Error
-                                               </span>
-                                           )}
+                                           {document.name}
                                        </h3>
+
                                        <div className="flex items-center space-x-4 text-sm text-gray-500">
-                                           <span>{documento.tamaño}</span>
+                                           <span>{document.file_size}</span>
                                            <span>•</span>
-                                           <span>Subido: {documento.fechaSubida}</span>
+                                           <span>Subido: {document.upload_date}</span>
                                        </div>
                                    </div>
                                </div>
 
                                <div className="flex items-center space-x-2">
-                                   <Button
-                                       variant="outline"
-                                       size="sm"
-                                       onClick={() => {
-                                           const url = URL.createObjectURL(documento.archivo)
-                                           window.open(url, '_blank')
-                                       }}
+                                   <Link
+                                        href={document.file_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                        className="border-blue-300 text-blue-600 hover:bg-blue-50"
                                    >
                                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,11 +158,11 @@ export const DocumentsUploadForm = ({token}:Props) => {
                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                        </svg>
                                        Ver
-                                   </Button>
+                                   </Link>
                                    <Button
                                        variant="outline"
                                        size="sm"
-                                       onClick={() => eliminarDocumento(documento.id)}
+                                       onClick={() => eliminarDocumento(document.id)}
                                        className="border-red-300 text-red-600 hover:bg-red-50"
                                    >
                                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -221,7 +196,7 @@ export const DocumentsUploadForm = ({token}:Props) => {
            )}
 
            {/* Mensaje si no hay documentos */}
-           {documentos.length === 0 && (
+           {documents.length === 0 && (
                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
                    <div className="text-gray-400 mb-4">
                        <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,4 +1,4 @@
-import { IApplicationRequest, IApplicationResponse, IUserApplicationsResponse, IProgramDocumentsResponse, IUploadDocumentResponse } from "@/interfaces";
+import { IApplicationRequest, IApplicationResponse, IUserApplicationsResponse, IProgramDocumentsResponse, IUploadDocumentResponse, IApplicantDocumentsResponse } from "@/interfaces";
 
 const SERVER_BASE = process.env.NEXT_BACKEND_API_URL;            // solo server
 const CLIENT_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -94,6 +94,36 @@ export const applicantService = {
         } catch (error) {
             console.error('Error al subir el documento:', error);
             throw new Error('Error al subir el documento');
+        }
+    },
+
+    /**
+     * Obtiene los documentos del solicitante
+     * @param token - Token de autorización Bearer
+     * @returns Promise con los documentos del solicitante
+     */
+    async getApplicantDocuments(token: string): Promise<IApplicantDocumentsResponse> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admission/applicant/documents`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                cache: 'no-store'
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            return data as IApplicantDocumentsResponse;
+        } catch (error) {
+            console.error('Error al obtener los documentos del solicitante:', error);
+            throw new Error('Error al cargar los documentos del solicitante');
         }
     }
 };
