@@ -1,43 +1,30 @@
 import { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { applicantService } from '@/services/laravel/Applicant.service';
-import { IUploadDocumentResponse } from '@/interfaces';
-
-interface DocumentoSubido {
-    id: number;
-    nombre: string;
-    tamaño: string;
-    tipo: string;
-    fechaSubida: string;
-    archivo: File;
-    uploaded?: boolean;
-    uploadResponse?: IUploadDocumentResponse;
-}
+import { IUploadDocumentResponse, IApplicantDocument } from '@/interfaces';
 
 interface AlertDialogState {
     isOpen: boolean;
     title: string;
     description: string;
-    type: 'error' | 'confirm' | 'info';
+    type: 'error' | 'confirm' | 'info' | 'success';
     onConfirm?: () => void;
     onCancel?: () => void;
 }
 
 interface UseApplicantDocumentsReturn {
-    documentos: DocumentoSubido[];
     subiendo: boolean;
     draggedOver: boolean;
     form: ReturnType<typeof useForm>;
     alertDialog: AlertDialogState;
     setAlertDialog: (state: AlertDialogState) => void;
     closeAlertDialog: () => void;
-    handleFileSelect: (files: FileList | null) => Promise<void>;
+    handleFileSelect: (files: FileList | null, onSuccess?: () => void) => Promise<void>;
     handleDragOver: (e: React.DragEvent) => void;
     handleDragLeave: (e: React.DragEvent) => void;
-    handleDrop: (e: React.DragEvent) => void;
+    handleDrop: (e: React.DragEvent, onSuccess?: () => void) => void;
     eliminarDocumento: (id: number) => void;
-    limpiarTodos: () => void;
-    subirDocumento: (file: File, documentName: string) => Promise<void>;
+    subirDocumento: (file: File, documentName: string) => Promise<IUploadDocumentResponse>;
 }
 
 export const useApplicantDocuments = (token: string): UseApplicantDocumentsReturn => {
@@ -69,6 +56,15 @@ export const useApplicantDocuments = (token: string): UseApplicantDocumentsRetur
         });
     }, [setAlertDialog]);
 
+    const showSuccessDialog = useCallback((title: string, description: string) => {
+        setAlertDialog({
+            isOpen: true,
+            title,
+            description,
+            type: 'success'
+        });
+    }, [setAlertDialog]);
+
     const showConfirmDialog = useCallback((title: string, description: string, onConfirm: () => void) => {
         setAlertDialog({
             isOpen: true,
@@ -80,77 +76,95 @@ export const useApplicantDocuments = (token: string): UseApplicantDocumentsRetur
         });
     }, [setAlertDialog, closeAlertDialog]);
 
-    const subirDocumento = useCallback(async (file: File, documentName: string) => {
+    const subirDocumento = useCallback(async (file: File, documentName: string): Promise<IUploadDocumentResponse> => {
         try {
             const response = await applicantService.uploadDocument(file, documentName, token);
             return response;
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error al subir documento:', error);
-            throw error;
+
+            // Mostrar error específico del backend
+            if (error.message && error.message.includes('validation')) {
+                throw new Error('Formato de archivo no válido. Solo se aceptan archivos PDF, JPG, JPEG y PNG.');
+            }
+
+            throw new Error('Error al subir el documento. Por favor, inténtalo de nuevo.');
         }
     }, [token]);
 
-    const handleFileSelect = useCallback(async (files: FileList | null) => {
+    const handleFileSelect = useCallback(async (files: FileList | null, onSuccess?: () => void) => {
         if (!files || files.length === 0) return;
 
-        setSubiendo(true);
+        // Validar formato de archivos
+        const validFormats = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+        const invalidFiles = Array.from(files).filter(file => !validFormats.includes(file.type));
 
-        const nuevosDocumentos: DocumentoSubido[] = [];
-        const uploadPromises: Promise<void>[] = [];
-
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-
-            // Validar tamaño máximo (10 MB)
-            const maxSize = 10 * 1024 * 1024;
-            if (file.size > maxSize) {
-                showErrorDialog(
-                    'Archivo demasiado grande',
-                    `El archivo "${file.name}" es demasiado grande. El tamaño máximo permitido es de 10 MB.`
-                );
-                continue;
-            }
-
-            // Crear documento local
-            const nuevoDocumento: DocumentoSubido = {
-                id: Date.now() + i,
-                nombre: file.name,
-                tamaño: (file.size / (1024 * 1024)).toFixed(2) + " MB",
-                tipo: file.type || "Desconocido",
-                fechaSubida: new Date().toLocaleString('es-ES'),
-                archivo: file,
-                uploaded: false
-            };
-
-            nuevosDocumentos.push(nuevoDocumento);
-
-            // Crear promesa de subida
-            const uploadPromise = subirDocumento(file, file.name.split('.')[0])
-                .then((response) => {
-                    // Actualizar documento con respuesta de subida exitosa
-
-                })
-                .catch((error) => {
-                    console.error(`Error al subir ${file.name}:`, error);
-                    // Marcar documento con error pero mantenerlo en la lista
-
-                    showErrorDialog(
-                        'Error al subir documento',
-                        `No se pudo subir el documento "${file.name}". Por favor, inténtalo de nuevo.`
-                    );
-                });
-
-            uploadPromises.push(uploadPromise);
+        if (invalidFiles.length > 0) {
+            showErrorDialog(
+                'Formato de archivo no válido',
+                `Solo se aceptan archivos PDF, JPG, JPEG y PNG. Archivos rechazados: ${invalidFiles.map(f => f.name).join(', ')}`
+            );
+            return;
         }
 
+        setSubiendo(true);
+        let uploadedCount = 0;
+        let errorCount = 0;
+        const errorDetails: string[] = [];
 
         try {
-            // Esperar a que todas las subidas terminen
-            await Promise.all(uploadPromises);
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+
+                // Validar tamaño máximo (10 MB)
+                const maxSize = 10 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    errorCount++;
+                    errorDetails.push(`${file.name}: Archivo demasiado grande (máximo 10 MB)`);
+                    continue;
+                }
+
+                try {
+                    const documentName = file.name.split('.')[0];
+                    await subirDocumento(file, documentName);
+                    uploadedCount++;
+                } catch (error: any) {
+                    errorCount++;
+                    console.error(`Error al subir ${file.name}:`, error);
+
+                    // Capturar errores específicos del backend
+                    if (error.message.includes('validation')) {
+                        errorDetails.push(`${file.name}: Formato no válido`);
+                    } else {
+                        errorDetails.push(`${file.name}: Error al subir`);
+                    }
+                }
+            }
+
+            // Mostrar resultado final
+            if (uploadedCount > 0 && errorCount === 0) {
+                showSuccessDialog(
+                    '¡Documentos subidos exitosamente!',
+                    `Se ${uploadedCount === 1 ? 'subió 1 documento' : `subieron ${uploadedCount} documentos`} correctamente.`
+                );
+                onSuccess?.();
+            } else if (uploadedCount > 0 && errorCount > 0) {
+                showErrorDialog(
+                    'Subida parcialmente exitosa',
+                    `Se subieron ${uploadedCount} documentos correctamente, pero ${errorCount} fallaron:\n${errorDetails.join('\n')}`
+                );
+                onSuccess?.();
+            } else if (errorCount > 0) {
+                showErrorDialog(
+                    'Error en la subida',
+                    `No se pudo subir ningún documento:\n${errorDetails.join('\n')}`
+                );
+            }
+
         } finally {
             setSubiendo(false);
         }
-    }, [subirDocumento, showErrorDialog]);
+    }, [subirDocumento, showErrorDialog, showSuccessDialog]);
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -162,14 +176,15 @@ export const useApplicantDocuments = (token: string): UseApplicantDocumentsRetur
         setDraggedOver(false);
     }, []);
 
-    const handleDrop = useCallback((e: React.DragEvent) => {
+    const handleDrop = useCallback((e: React.DragEvent, onSuccess?: () => void) => {
         e.preventDefault();
         setDraggedOver(false);
-        handleFileSelect(e.dataTransfer.files);
+        handleFileSelect(e.dataTransfer.files, onSuccess);
     }, [handleFileSelect]);
 
     const eliminarDocumento = useCallback((id: number) => {
-
+        // TODO: Implementar eliminación de documento
+        console.log('Eliminar documento:', id);
     }, []);
 
     return {

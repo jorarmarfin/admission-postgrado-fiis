@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import {
     AlertDialog,
@@ -14,13 +14,33 @@ import {
 } from "@/components/ui/alert-dialog"
 import Link from "next/link"
 import { useApplicantDocuments } from "@/hooks/useApplicantDocuments"
-import {IApplicantDocument} from "@/interfaces";
+import { IApplicantDocument } from "@/interfaces"
+import { applicantService } from "@/services"
+import { useRouter } from "next/navigation"
 
 interface Props{
     token: string,
     documents: IApplicantDocument[]
 }
-export const DocumentsUploadForm = ({token,documents}:Props) => {
+
+export const DocumentsUploadForm = ({token, documents: initialDocuments}:Props) => {
+    const router = useRouter()
+    const [documents, setDocuments] = useState<IApplicantDocument[]>(initialDocuments)
+    const [refreshing, setRefreshing] = useState(false)
+
+    const refreshDocuments = useCallback(async () => {
+        setRefreshing(true)
+        try {
+            const response = await applicantService.getApplicantDocuments(token)
+            setDocuments(response.data)
+            router.refresh() // Opcional: refrescar toda la página para sincronizar con el servidor
+        } catch (error) {
+            console.error('Error al recargar documentos:', error)
+        } finally {
+            setRefreshing(false)
+        }
+    }, [token, router])
+
     const {
         subiendo,
         draggedOver,
@@ -33,14 +53,18 @@ export const DocumentsUploadForm = ({token,documents}:Props) => {
         eliminarDocumento,
     } = useApplicantDocuments(token);
 
-    const getTipoIcon = (tipo: string) => {
-        if (tipo.includes('pdf')) {
+    const handleSuccessfulUpload = useCallback(() => {
+        refreshDocuments()
+    }, [refreshDocuments])
+
+    const getTipoIcon = (fileIcon: string) => {
+        if (fileIcon === 'document-text' || fileIcon.includes('pdf')) {
             return (
                 <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
             )
-        } else if (tipo.includes('image')) {
+        } else if (fileIcon.includes('image')) {
             return (
                 <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -59,9 +83,29 @@ export const DocumentsUploadForm = ({token,documents}:Props) => {
        <>
            {/* Zona de carga */}
            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
-               <h2 className="text-xl font-bold text-gray-900 mb-6">
-                   Subir Documentos
-               </h2>
+               <div className="flex items-center justify-between mb-6">
+                   <h2 className="text-xl font-bold text-gray-900">
+                       Subir Documentos
+                   </h2>
+                   {documents.length > 0 && (
+                       <Button
+                           variant="outline"
+                           size="sm"
+                           onClick={refreshDocuments}
+                           disabled={refreshing}
+                           className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                       >
+                           {refreshing ? (
+                               <div className="w-4 h-4 mr-2 animate-spin rounded-full border-b-2 border-blue-600"></div>
+                           ) : (
+                               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                               </svg>
+                           )}
+                           Actualizar
+                       </Button>
+                   )}
+               </div>
 
                <div
                    className={`border-2 border-dashed rounded-lg p-12 text-center transition-all duration-200 ${
@@ -71,7 +115,7 @@ export const DocumentsUploadForm = ({token,documents}:Props) => {
                    } ${subiendo ? 'pointer-events-none opacity-75' : 'cursor-pointer'}`}
                    onDragOver={handleDragOver}
                    onDragLeave={handleDragLeave}
-                   onDrop={handleDrop}
+                   onDrop={(e) => handleDrop(e, handleSuccessfulUpload)}
                    onClick={() => !subiendo && document.getElementById('file-input')?.click()}
                >
                    {subiendo ? (
@@ -100,7 +144,7 @@ export const DocumentsUploadForm = ({token,documents}:Props) => {
                                </Button>
                            </div>
                            <div className="text-xs text-gray-400 border-t pt-4">
-                               <p>Formatos aceptados: PDF, JPG, PNG, DOC, DOCX</p>
+                               <p>Formatos aceptados: PDF, JPG, PNG</p>
                                <p>Tamaño máximo por archivo: 10 MB</p>
                            </div>
                        </div>
@@ -110,8 +154,8 @@ export const DocumentsUploadForm = ({token,documents}:Props) => {
                        id="file-input"
                        type="file"
                        multiple
-                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                       onChange={(e) => handleFileSelect(e.target.files)}
+                       accept=".pdf,.jpg,.jpeg,.png"
+                       onChange={(e) => handleFileSelect(e.target.files, handleSuccessfulUpload)}
                        className="hidden"
                    />
                </div>
@@ -141,24 +185,30 @@ export const DocumentsUploadForm = ({token,documents}:Props) => {
                                        <div className="flex items-center space-x-4 text-sm text-gray-500">
                                            <span>{document.file_size}</span>
                                            <span>•</span>
-                                           <span>Subido: {document.upload_date}</span>
+                                           <span>Subido: {document.upload_date ? new Date(document.upload_date).toLocaleDateString('es-ES') : 'Reciente'}</span>
                                        </div>
                                    </div>
                                </div>
 
                                <div className="flex items-center space-x-2">
-                                   <Link
-                                        href={document.file_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                   <Button
+                                       variant="outline"
+                                       size="sm"
+                                       asChild
                                        className="border-blue-300 text-blue-600 hover:bg-blue-50"
                                    >
-                                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                       </svg>
-                                       Ver
-                                   </Link>
+                                       <Link
+                                            href={document.file_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                       >
+                                           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                           </svg>
+                                           Ver
+                                       </Link>
+                                   </Button>
                                    <Button
                                        variant="outline"
                                        size="sm"
@@ -177,12 +227,6 @@ export const DocumentsUploadForm = ({token,documents}:Props) => {
 
                    {/* Acciones finales */}
                    <div className="flex justify-center space-x-4 mt-8 pt-6 border-t border-gray-200">
-                       <Button
-                           variant="outline"
-                           className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                       >
-                           Guardar Progreso
-                       </Button>
                        <Link href="/interview">
                            <Button className="bg-green-600 hover:bg-green-700 text-white px-8">
                                Continuar: Agendar Entrevista
@@ -212,14 +256,27 @@ export const DocumentsUploadForm = ({token,documents}:Props) => {
                </div>
            )}
 
-           {/* AlertDialog para mensajes */}
+           {/* AlertDialog mejorado para diferentes tipos de mensajes */}
            <AlertDialog open={alertDialog.isOpen} onOpenChange={closeAlertDialog}>
                <AlertDialogContent>
                    <AlertDialogHeader>
-                       <AlertDialogTitle className={alertDialog.type === 'error' ? 'text-red-600' : ''}>
+                       <AlertDialogTitle className={`flex items-center gap-2 ${
+                           alertDialog.type === 'error' ? 'text-red-600' : 
+                           alertDialog.type === 'success' ? 'text-green-600' : ''
+                       }`}>
+                           {alertDialog.type === 'success' && (
+                               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                               </svg>
+                           )}
+                           {alertDialog.type === 'error' && (
+                               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                               </svg>
+                           )}
                            {alertDialog.title}
                        </AlertDialogTitle>
-                       <AlertDialogDescription>
+                       <AlertDialogDescription className="whitespace-pre-line">
                            {alertDialog.description}
                        </AlertDialogDescription>
                    </AlertDialogHeader>
