@@ -17,7 +17,7 @@ export default function IntranetLayout({ children }: { children: React.ReactNode
                             </div>
                             <div>
                                 <h1 className="text-xl font-bold text-red-800">
-                                    Admisión Postgrado
+                                    Admisión Posgrado
                                 </h1>
                                 <p className="text-sm text-gray-600">
                                     Universidad Nacional de Ingeniería <br/>

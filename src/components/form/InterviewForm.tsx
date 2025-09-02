@@ -2,7 +2,19 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import Link from "next/link"
+import {IInterviewerAvailability} from "@/interfaces";
 
 interface HorarioDisponible {
     id: string
@@ -10,61 +22,50 @@ interface HorarioDisponible {
     fechaCompleta: Date
     hora: string
     disponible: boolean
-    entrevistador: string
+    profesorNombre: string
+    programaNombre: string
+    periodoAcademico: string
+    capacity: number
 }
 
-export const InterviewForm = () => {
-    // Generar fechas y horarios disponibles para las próximas 2 semanas
-    const generarHorariosDisponibles = (): HorarioDisponible[] => {
-        const horarios: HorarioDisponible[] = []
-        const hoy = new Date()
-        const entrevistadores = [
-            "Dr. García Mendoza",
-            "Mg. López Rivera",
-            "Dr. Santamaría Cruz",
-            "Mg. Rodríguez Vega"
-        ]
+interface Props{
+    interviewerAvailabilities: IInterviewerAvailability[]
+}
 
-        // Horarios disponibles por día
-        const horasDisponibles = [
-            "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-            "14:00", "14:30", "15:00", "15:30", "16:00", "16:30"
-        ]
+export const InterviewForm = ({interviewerAvailabilities}: Props) => {
+    // Convertir los datos del API a formato local
+    const convertirHorariosAPI = (): HorarioDisponible[] => {
+        return interviewerAvailabilities.map(availability => {
+            const fechaCompleta = new Date(availability.interviewer_start_at)
+            const fecha = fechaCompleta.toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })
+            const hora = fechaCompleta.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            })
 
-        // Generar horarios para 14 días (2 semanas)
-        for (let dia = 1; dia <= 14; dia++) {
-            const fecha = new Date(hoy)
-            fecha.setDate(hoy.getDate() + dia)
-
-            // Solo días laborables (lunes a viernes)
-            if (fecha.getDay() >= 1 && fecha.getDay() <= 5) {
-                horasDisponibles.forEach((hora, index) => {
-                    // Simular disponibilidad aleatoria (70% de probabilidad de estar disponible)
-                    const disponible = Math.random() > 0.3
-
-                    horarios.push({
-                        id: `${fecha.toISOString().split('T')[0]}-${hora}`,
-                        fecha: fecha.toLocaleDateString('es-ES', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        }),
-                        fechaCompleta: fecha,
-                        hora: hora,
-                        disponible: disponible,
-                        entrevistador: entrevistadores[Math.floor(Math.random() * entrevistadores.length)]
-                    })
-                })
+            return {
+                id: `${availability.interviewer_start_at}-${availability.professor_name}`,
+                fecha: fecha,
+                fechaCompleta: fechaCompleta,
+                hora: hora,
+                disponible: availability.capacity > 0,
+                profesorNombre: availability.professor_name,
+                programaNombre: availability.program_name,
+                periodoAcademico: availability.academic_period_name,
+                capacity: availability.capacity
             }
-        }
-
-        return horarios
+        })
     }
 
-    const [horariosDisponibles] = useState<HorarioDisponible[]>(generarHorariosDisponibles())
+    const [horariosDisponibles] = useState<HorarioDisponible[]>(convertirHorariosAPI())
     const [horarioSeleccionado, setHorarioSeleccionado] = useState<HorarioDisponible | null>(null)
-    const [confirmando, setConfirmando] = useState(false)
+    const [showDialog, setShowDialog] = useState(false)
 
     const agruparPorFecha = () => {
         const grupos: { [fecha: string]: HorarioDisponible[] } = {}
@@ -80,16 +81,14 @@ export const InterviewForm = () => {
         return grupos
     }
 
-    const confirmarEntrevista = async () => {
-        if (!horarioSeleccionado) return
+    const handleHorarioClick = (horario: HorarioDisponible) => {
+        if (horario.disponible) {
+            setHorarioSeleccionado(horario)
+        }
+    }
 
-        setConfirmando(true)
-
-        // Simular confirmación de entrevista
-        setTimeout(() => {
-            setConfirmando(false)
-            alert(`¡Entrevista confirmada para el ${horarioSeleccionado.fecha} a las ${horarioSeleccionado.hora} con ${horarioSeleccionado.entrevistador}!`)
-        }, 2000)
+    const confirmarEntrevista = () => {
+        setShowDialog(true)
     }
 
     const gruposFechas = agruparPorFecha()
@@ -140,7 +139,7 @@ export const InterviewForm = () => {
                                 <ul className="text-sm text-blue-800 space-y-1">
                                     <li>• Duración aproximada: 30 minutos</li>
                                     <li>• Modalidad: Presencial en las instalaciones de FIIS</li>
-                                    <li>• Horarios disponibles: Lunes a Viernes, 9:00 AM - 5:00 PM</li>
+                                    <li>• Horarios disponibles según disponibilidad del profesor</li>
                                     <li>• Una vez confirmada, recibirás un email con los detalles</li>
                                 </ul>
                             </div>
@@ -154,52 +153,70 @@ export const InterviewForm = () => {
                         Selecciona tu horario preferido
                     </h2>
 
-                    <div className="space-y-8">
-                        {fechasOrdenadas.map(fechaKey => {
-                            const horariosDia = gruposFechas[fechaKey]
-                            const fecha = horariosDia[0]
+                    {fechasOrdenadas.length === 0 ? (
+                        <div className="text-center py-12">
+                            <div className="text-gray-500 mb-4">
+                                <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0V6a2 2 0 012-2h4a2 2 0 012 2v1M8 7V6a2 2 0 012-2h4a2 2 0 012 2v1m0 0h4a2 2 0 012 2v12a1 1 0 01-1 1H5a1 1 0 01-1-1V9a2 2 0 012-2h4m0 0V7" />
+                                </svg>
+                                <p className="text-lg font-medium text-gray-600">No hay horarios disponibles en este momento</p>
+                                <p className="text-sm text-gray-500 mt-2">Por favor, contacta con admisiones para más información</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-8">
+                            {fechasOrdenadas.map(fechaKey => {
+                                const horariosDia = gruposFechas[fechaKey]
+                                const fecha = horariosDia[0]
 
-                            return (
-                                <div key={fechaKey} className="border-b border-gray-100 pb-6 last:border-b-0">
-                                    <h3 className="text-lg font-semibold text-gray-800 mb-4 capitalize">
-                                        {fecha.fecha}
-                                    </h3>
+                                return (
+                                    <div key={fechaKey} className="border-b border-gray-100 pb-6 last:border-b-0">
+                                        <h3 className="text-lg font-semibold text-gray-800 mb-4 capitalize">
+                                            {fecha.fecha}
+                                        </h3>
 
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                                        {horariosDia.map(horario => (
-                                            <button
-                                                key={horario.id}
-                                                onClick={() => horario.disponible && setHorarioSeleccionado(horario)}
-                                                disabled={!horario.disponible}
-                                                className={`
-                                                    p-3 rounded-lg border text-sm font-medium transition-all duration-200 
-                                                    ${horario.disponible 
-                                                        ? horarioSeleccionado?.id === horario.id
-                                                            ? 'bg-red-800 text-white border-red-800 shadow-md'
-                                                            : 'bg-white text-gray-700 border-gray-300 hover:border-red-300 hover:bg-red-50'
-                                                        : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-                                                    }
-                                                `}
-                                            >
-                                                <div className="font-semibold">
-                                                    {horario.hora}
-                                                </div>
-                                                {horario.disponible ? (
-                                                    <div className="text-xs mt-1 opacity-75">
-                                                        Disponible
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                            {horariosDia.map(horario => (
+                                                <button
+                                                    key={horario.id}
+                                                    onClick={() => handleHorarioClick(horario)}
+                                                    disabled={!horario.disponible}
+                                                    className={`
+                                                        p-4 rounded-lg border text-left transition-all duration-200 
+                                                        ${horario.disponible 
+                                                            ? horarioSeleccionado?.id === horario.id
+                                                                ? 'bg-red-800 text-white border-red-800 shadow-md'
+                                                                : 'bg-white text-gray-700 border-gray-300 hover:border-red-300 hover:bg-red-50'
+                                                            : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                                                        }
+                                                    `}
+                                                >
+                                                    <div className="font-semibold text-lg mb-1">
+                                                        {horario.hora}
                                                     </div>
-                                                ) : (
-                                                    <div className="text-xs mt-1">
-                                                        Ocupado
+                                                    <div className={`text-sm mb-2 ${horarioSeleccionado?.id === horario.id ? 'text-red-100' : 'text-gray-600'}`}>
+                                                        {horario.profesorNombre}
                                                     </div>
-                                                )}
-                                            </button>
-                                        ))}
+                                                    <div className={`text-xs ${horarioSeleccionado?.id === horario.id ? 'text-red-200' : 'text-gray-500'}`}>
+                                                        {horario.programaNombre}
+                                                    </div>
+                                                    <div className={`text-xs mt-2 font-medium ${
+                                                        horario.disponible 
+                                                            ? horarioSeleccionado?.id === horario.id 
+                                                                ? 'text-green-200' 
+                                                                : 'text-green-600'
+                                                            : 'text-red-500'
+                                                    }`}>
+                                                        {horario.disponible ? 'Disponible' : 'Ocupado'}
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            )
-                        })}
-                    </div>
+                                )
+                            })}
+                        </div>
+                    )}
 
                     {/* Horario seleccionado */}
                     {horarioSeleccionado && (
@@ -224,7 +241,15 @@ export const InterviewForm = () => {
                                 </div>
                                 <div>
                                     <span className="font-medium text-green-900">Entrevistador:</span>
-                                    <p className="text-green-800">{horarioSeleccionado.entrevistador}</p>
+                                    <p className="text-green-800">{horarioSeleccionado.profesorNombre}</p>
+                                </div>
+                                <div>
+                                    <span className="font-medium text-green-900">Programa:</span>
+                                    <p className="text-green-800">{horarioSeleccionado.programaNombre}</p>
+                                </div>
+                                <div>
+                                    <span className="font-medium text-green-900">Período:</span>
+                                    <p className="text-green-800">{horarioSeleccionado.periodoAcademico}</p>
                                 </div>
                                 <div>
                                     <span className="font-medium text-green-900">Ubicación:</span>
@@ -244,25 +269,50 @@ export const InterviewForm = () => {
                         >
                             Limpiar Selección
                         </Button>
-                        <Button
-                            onClick={confirmarEntrevista}
-                            disabled={!horarioSeleccionado || confirmando}
-                            className="bg-green-600 hover:bg-green-700 text-white px-8"
-                        >
-                            {confirmando ? (
-                                <div className="flex items-center space-x-2">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                    <span>Confirmando...</span>
-                                </div>
-                            ) : (
-                                <>
+                        
+                        <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
+                            <AlertDialogTrigger asChild>
+                                <Button
+                                    disabled={!horarioSeleccionado}
+                                    className="bg-green-600 hover:bg-green-700 text-white px-8"
+                                >
                                     Confirmar Entrevista
                                     <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                </>
-                            )}
-                        </Button>
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Confirmar Entrevista</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        {horarioSeleccionado && (
+                                            <div className="mt-4">
+                                                <p className="mb-4">¿Estás seguro de que deseas confirmar esta entrevista?</p>
+                                                <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-sm">
+                                                    <div><span className="font-medium">Fecha:</span> {horarioSeleccionado.fecha}</div>
+                                                    <div><span className="font-medium">Hora:</span> {horarioSeleccionado.hora}</div>
+                                                    <div><span className="font-medium">Entrevistador:</span> {horarioSeleccionado.profesorNombre}</div>
+                                                    <div><span className="font-medium">Programa:</span> {horarioSeleccionado.programaNombre}</div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction 
+                                        onClick={() => {
+                                            // Aquí se implementará la lógica de confirmación
+                                            console.log('Entrevista confirmada:', horarioSeleccionado)
+                                        }}
+                                        className="bg-green-600 hover:bg-green-700"
+                                    >
+                                        Confirmar
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </div>
                 </div>
 

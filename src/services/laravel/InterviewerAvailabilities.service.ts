@@ -1,9 +1,6 @@
 import { ApiResponse, IInterviewerAvailability } from "@/interfaces";
 
-const SERVER_BASE = process.env.NEXT_BACKEND_API_URL;            // solo server
-const CLIENT_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-export const API_BASE_URL =
-    typeof window === 'undefined' ? SERVER_BASE : CLIENT_BASE;
+const API_BASE_URL = process.env.NEXT_BACKEND_API_URL;
 
 export const interviewerAvailabilitiesService = {
     /**
@@ -22,7 +19,6 @@ export const interviewerAvailabilitiesService = {
                 },
                 cache: 'no-store'
             });
-
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
