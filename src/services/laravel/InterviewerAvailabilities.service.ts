@@ -10,7 +10,7 @@ export const interviewerAvailabilitiesService = {
      */
     async getInterviewerAvailabilities(token: string): Promise<IInterviewerAvailability[]> {
         try {
-            const response = await fetch(`${API_BASE_URL}/interviewer-availabilities`, {
+            const response = await fetch(`${API_BASE_URL}/admission/interviewer-availabilities`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

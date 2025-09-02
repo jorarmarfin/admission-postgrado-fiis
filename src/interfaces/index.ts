@@ -8,3 +8,4 @@ export * from './Login.interface';
 export * from './Program.interface';
 export * from './University.interface';
 export * from './InterviewerAvailability';
+export * from './InterviewAppointment.interface';

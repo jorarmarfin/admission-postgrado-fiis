@@ -10,5 +10,5 @@ export default async function InterviewPage() {
     const token = session?.accessToken ?? '';
     const interviewerAvailabilities: IInterviewerAvailability[] = await interviewerAvailabilitiesService.getInterviewerAvailabilities(token);
 
-    return <InterviewForm />;
+    return <InterviewForm interviewerAvailabilities={interviewerAvailabilities} />;
 }

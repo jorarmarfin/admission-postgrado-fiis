@@ -6,3 +6,4 @@ export { bankService } from './laravel/Bank.service';
 export { documentTypesService } from './laravel/DocumentTypes.service';
 export { loginService } from './laravel/Login.service';
 export { interviewerAvailabilitiesService } from './laravel/InterviewerAvailabilities.service';
+export { interviewAppointmentService } from './laravel/InterviewAppointment.service';

@@ -14,7 +14,9 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import Link from "next/link"
-import {IInterviewerAvailability} from "@/interfaces";
+import { IInterviewerAvailability, ICreateInterviewAppointmentRequest } from "@/interfaces";
+import { interviewAppointmentService } from "@/services";
+import { useSession } from "next-auth/react";
 
 interface HorarioDisponible {
     id: string
@@ -26,6 +28,7 @@ interface HorarioDisponible {
     programaNombre: string
     periodoAcademico: string
     capacity: number
+    availabilityId: number
 }
 
 interface Props{
@@ -33,9 +36,13 @@ interface Props{
 }
 
 export const InterviewForm = ({interviewerAvailabilities}: Props) => {
+    const { data: session } = useSession();
+    const [isLoading, setIsLoading] = useState(false);
+    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
     // Convertir los datos del API a formato local
     const convertirHorariosAPI = (): HorarioDisponible[] => {
-        return interviewerAvailabilities.map(availability => {
+        return interviewerAvailabilities.map((availability, index) => {
             const fechaCompleta = new Date(availability.interviewer_start_at)
             const fecha = fechaCompleta.toLocaleDateString('es-ES', {
                 weekday: 'long',
@@ -58,7 +65,8 @@ export const InterviewForm = ({interviewerAvailabilities}: Props) => {
                 profesorNombre: availability.professor_name,
                 programaNombre: availability.program_name,
                 periodoAcademico: availability.academic_period_name,
-                capacity: availability.capacity
+                capacity: availability.capacity,
+                availabilityId: index + 1 // Temporal - necesitarás el ID real del backend
             }
         })
     }
@@ -84,12 +92,42 @@ export const InterviewForm = ({interviewerAvailabilities}: Props) => {
     const handleHorarioClick = (horario: HorarioDisponible) => {
         if (horario.disponible) {
             setHorarioSeleccionado(horario)
+            setMessage(null) // Limpiar mensajes anteriores
         }
     }
 
-    const confirmarEntrevista = () => {
-        setShowDialog(true)
-    }
+    const confirmarEntrevista = async () => {
+        if (!horarioSeleccionado || !session?.user?.token) {
+            setMessage({ type: 'error', text: 'No se puede crear la cita. Por favor, inicia sesión nuevamente.' });
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            const appointmentData: ICreateInterviewAppointmentRequest = {
+                interviewer_availabilitie_id: horarioSeleccionado.availabilityId
+            };
+
+            const result = await interviewAppointmentService.createInterviewAppointment(
+                appointmentData,
+                session.user.token
+            );
+
+            if (result.status === 'success') {
+                setMessage({ type: 'success', text: result.message });
+                setShowDialog(false);
+                // Opcional: redirigir o actualizar la página
+                // window.location.reload();
+            } else {
+                setMessage({ type: 'error', text: result.message });
+            }
+        } catch (error) {
+            setMessage({ type: 'error', text: 'Error inesperado. Por favor, inténtalo de nuevo.' });
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const gruposFechas = agruparPorFecha()
     const fechasOrdenadas = Object.keys(gruposFechas).sort()
@@ -97,6 +135,28 @@ export const InterviewForm = ({interviewerAvailabilities}: Props) => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
             <div className="max-w-4xl mx-auto">
+                {/* Mensaje de resultado */}
+                {message && (
+                    <div className={`mb-6 p-4 rounded-lg border ${
+                        message.type === 'success' 
+                            ? 'bg-green-50 border-green-200 text-green-800' 
+                            : 'bg-red-50 border-red-200 text-red-800'
+                    }`}>
+                        <div className="flex items-center space-x-3">
+                            {message.type === 'success' ? (
+                                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            ) : (
+                                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            )}
+                            <span className="font-medium">{message.text}</span>
+                        </div>
+                    </div>
+                )}
+
                 {/* Header */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
                     <div className="flex items-center justify-between mb-6">
@@ -259,11 +319,14 @@ export const InterviewForm = ({interviewerAvailabilities}: Props) => {
                         </div>
                     )}
 
-                    {/* Botones de acción */}
+                    {/* Botones de acción actualizados */}
                     <div className="flex justify-center space-x-4 mt-8 pt-6 border-t border-gray-200">
                         <Button
                             variant="outline"
-                            onClick={() => setHorarioSeleccionado(null)}
+                            onClick={() => {
+                                setHorarioSeleccionado(null);
+                                setMessage(null);
+                            }}
                             disabled={!horarioSeleccionado}
                             className="border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
@@ -273,13 +336,25 @@ export const InterviewForm = ({interviewerAvailabilities}: Props) => {
                         <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
                             <AlertDialogTrigger asChild>
                                 <Button
-                                    disabled={!horarioSeleccionado}
+                                    disabled={!horarioSeleccionado || isLoading}
                                     className="bg-green-600 hover:bg-green-700 text-white px-8"
                                 >
-                                    Confirmar Entrevista
-                                    <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
+                                    {isLoading ? (
+                                        <>
+                                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Procesando...
+                                        </>
+                                    ) : (
+                                        <>
+                                            Confirmar Entrevista
+                                            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </>
+                                    )}
                                 </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
@@ -300,15 +375,13 @@ export const InterviewForm = ({interviewerAvailabilities}: Props) => {
                                     </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                    <AlertDialogAction 
-                                        onClick={() => {
-                                            // Aquí se implementará la lógica de confirmación
-                                            console.log('Entrevista confirmada:', horarioSeleccionado)
-                                        }}
+                                    <AlertDialogCancel disabled={isLoading}>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={confirmarEntrevista}
+                                        disabled={isLoading}
                                         className="bg-green-600 hover:bg-green-700"
                                     >
-                                        Confirmar
+                                        {isLoading ? 'Confirmando...' : 'Confirmar'}
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
@@ -342,3 +415,4 @@ export const InterviewForm = ({interviewerAvailabilities}: Props) => {
         </div>
     )
 }
+
