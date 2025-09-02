@@ -1,4 +1,4 @@
-import { ICreateInterviewAppointmentRequest, ICreateInterviewAppointmentResponse } from "@/interfaces";
+import {ICreateInterviewAppointmentRequest, ICreateInterviewAppointmentResponse} from "@/interfaces";
 
 const SERVER_BASE = process.env.NEXT_BACKEND_API_URL;
 const CLIENT_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -27,11 +27,9 @@ export const interviewAppointmentService = {
                 body: JSON.stringify(appointmentData)
             });
 
-            const result: ICreateInterviewAppointmentResponse = await response.json();
-
             // Devolver la respuesta tal como viene del servidor
             // para que el front pueda manejar tanto éxito como error
-            return result;
+            return await response.json();
 
         } catch (error) {
             console.error('Error al crear la cita de entrevista:', error);

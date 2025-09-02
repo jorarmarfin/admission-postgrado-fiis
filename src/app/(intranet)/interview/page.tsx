@@ -1,14 +1,20 @@
 import {InterviewForm} from "@/components";
-import {interviewerAvailabilitiesService} from "@/services";
+import {interviewAvailabilitiesService} from "@/services";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/lib/auth";
-import {IInterviewerAvailability} from "@/interfaces";
+import {IInterviewAvailability} from "@/interfaces";
+import {Metadata} from "next";
+
+export const metadata: Metadata = {
+    title: "Entrevistas - FIIS UNI",
+    description: "Página de gestión de entrevistas",
+}
 
 
 export default async function InterviewPage() {
     const session = await getServerSession(authOptions);
     const token = session?.accessToken ?? '';
-    const interviewerAvailabilities: IInterviewerAvailability[] = await interviewerAvailabilitiesService.getInterviewerAvailabilities(token);
+    const interviewAvailabilities: IInterviewAvailability[] = await interviewAvailabilitiesService.getInterviewAvailabilities(token);
 
-    return <InterviewForm interviewerAvailabilities={interviewerAvailabilities} />;
+    return <InterviewForm interviewAvailabilities={interviewAvailabilities} token={token} />;
 }

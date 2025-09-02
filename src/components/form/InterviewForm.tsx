@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
     AlertDialog,
@@ -14,123 +13,27 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import Link from "next/link"
-import { IInterviewerAvailability, ICreateInterviewAppointmentRequest } from "@/interfaces";
-import { interviewAppointmentService } from "@/services";
-import { useSession } from "next-auth/react";
-
-interface HorarioDisponible {
-    id: string
-    fecha: string
-    fechaCompleta: Date
-    hora: string
-    disponible: boolean
-    profesorNombre: string
-    programaNombre: string
-    periodoAcademico: string
-    capacity: number
-    availabilityId: number
-}
+import { useInterviewForm } from "@/hooks"
+import {IInterviewAvailability} from "@/interfaces";
 
 interface Props{
-    interviewerAvailabilities: IInterviewerAvailability[]
+    interviewAvailabilities: IInterviewAvailability[]
+    token: string
 }
 
-export const InterviewForm = ({interviewerAvailabilities}: Props) => {
-    const { data: session } = useSession();
-    const [isLoading, setIsLoading] = useState(false);
-    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-
-    // Convertir los datos del API a formato local
-    const convertirHorariosAPI = (): HorarioDisponible[] => {
-        return interviewerAvailabilities.map((availability, index) => {
-            const fechaCompleta = new Date(availability.interviewer_start_at)
-            const fecha = fechaCompleta.toLocaleDateString('es-ES', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            })
-            const hora = fechaCompleta.toLocaleTimeString('es-ES', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            })
-
-            return {
-                id: `${availability.interviewer_start_at}-${availability.professor_name}`,
-                fecha: fecha,
-                fechaCompleta: fechaCompleta,
-                hora: hora,
-                disponible: availability.capacity > 0,
-                profesorNombre: availability.professor_name,
-                programaNombre: availability.program_name,
-                periodoAcademico: availability.academic_period_name,
-                capacity: availability.capacity,
-                availabilityId: index + 1 // Temporal - necesitarás el ID real del backend
-            }
-        })
-    }
-
-    const [horariosDisponibles] = useState<HorarioDisponible[]>(convertirHorariosAPI())
-    const [horarioSeleccionado, setHorarioSeleccionado] = useState<HorarioDisponible | null>(null)
-    const [showDialog, setShowDialog] = useState(false)
-
-    const agruparPorFecha = () => {
-        const grupos: { [fecha: string]: HorarioDisponible[] } = {}
-
-        horariosDisponibles.forEach(horario => {
-            const fechaKey = horario.fechaCompleta.toDateString()
-            if (!grupos[fechaKey]) {
-                grupos[fechaKey] = []
-            }
-            grupos[fechaKey].push(horario)
-        })
-
-        return grupos
-    }
-
-    const handleHorarioClick = (horario: HorarioDisponible) => {
-        if (horario.disponible) {
-            setHorarioSeleccionado(horario)
-            setMessage(null) // Limpiar mensajes anteriores
-        }
-    }
-
-    const confirmarEntrevista = async () => {
-        if (!horarioSeleccionado || !session?.user?.token) {
-            setMessage({ type: 'error', text: 'No se puede crear la cita. Por favor, inicia sesión nuevamente.' });
-            return;
-        }
-
-        setIsLoading(true);
-
-        try {
-            const appointmentData: ICreateInterviewAppointmentRequest = {
-                interviewer_availabilitie_id: horarioSeleccionado.availabilityId
-            };
-
-            const result = await interviewAppointmentService.createInterviewAppointment(
-                appointmentData,
-                session.user.token
-            );
-
-            if (result.status === 'success') {
-                setMessage({ type: 'success', text: result.message });
-                setShowDialog(false);
-                // Opcional: redirigir o actualizar la página
-                // window.location.reload();
-            } else {
-                setMessage({ type: 'error', text: result.message });
-            }
-        } catch (error) {
-            setMessage({ type: 'error', text: 'Error inesperado. Por favor, inténtalo de nuevo.' });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const gruposFechas = agruparPorFecha()
-    const fechasOrdenadas = Object.keys(gruposFechas).sort()
+export const InterviewForm = ({interviewAvailabilities,token}: Props) => {
+    const {
+        horarioSeleccionado,
+        showDialog,
+        isLoading,
+        message,
+        gruposFechas,
+        fechasOrdenadas,
+        setShowDialog,
+        handleHorarioClick,
+        confirmarEntrevista,
+        limpiarSeleccion
+    } = useInterviewForm(interviewAvailabilities,token)
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
@@ -198,7 +101,6 @@ export const InterviewForm = ({interviewerAvailabilities}: Props) => {
                                 <h3 className="font-semibold text-blue-900 mb-2">Información sobre la Entrevista</h3>
                                 <ul className="text-sm text-blue-800 space-y-1">
                                     <li>• Duración aproximada: 30 minutos</li>
-                                    <li>• Modalidad: Presencial en las instalaciones de FIIS</li>
                                     <li>• Horarios disponibles según disponibilidad del profesor</li>
                                     <li>• Una vez confirmada, recibirás un email con los detalles</li>
                                 </ul>
@@ -313,7 +215,7 @@ export const InterviewForm = ({interviewerAvailabilities}: Props) => {
                                 </div>
                                 <div>
                                     <span className="font-medium text-green-900">Ubicación:</span>
-                                    <p className="text-green-800">FIIS - Oficina de Postgrado</p>
+                                    <p className="text-green-800">{horarioSeleccionado.location}</p>
                                 </div>
                             </div>
                         </div>
@@ -323,10 +225,7 @@ export const InterviewForm = ({interviewerAvailabilities}: Props) => {
                     <div className="flex justify-center space-x-4 mt-8 pt-6 border-t border-gray-200">
                         <Button
                             variant="outline"
-                            onClick={() => {
-                                setHorarioSeleccionado(null);
-                                setMessage(null);
-                            }}
+                            onClick={limpiarSeleccion}
                             disabled={!horarioSeleccionado}
                             className="border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
@@ -360,7 +259,7 @@ export const InterviewForm = ({interviewerAvailabilities}: Props) => {
                             <AlertDialogContent>
                                 <AlertDialogHeader>
                                     <AlertDialogTitle>Confirmar Entrevista</AlertDialogTitle>
-                                    <AlertDialogDescription>
+                                    <AlertDialogDescription asChild>
                                         {horarioSeleccionado && (
                                             <div className="mt-4">
                                                 <p className="mb-4">¿Estás seguro de que deseas confirmar esta entrevista?</p>
@@ -415,4 +314,3 @@ export const InterviewForm = ({interviewerAvailabilities}: Props) => {
         </div>
     )
 }
-
