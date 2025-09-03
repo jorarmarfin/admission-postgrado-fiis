@@ -15,6 +15,7 @@ import {
 import Link from "next/link"
 import { useInterviewForm } from "@/hooks"
 import {IInterviewAvailability} from "@/interfaces";
+import { useEffect, useState } from "react";
 
 interface Props{
     interviewAvailabilities: IInterviewAvailability[]
@@ -35,8 +36,68 @@ export const InterviewForm = ({interviewAvailabilities,token,myScheduledIntervie
         confirmarEntrevista,
         limpiarSeleccion
     } = useInterviewForm(interviewAvailabilities,token)
+
+    const [showMessageDialog, setShowMessageDialog] = useState(false);
+
+    // Mostrar el popup de mensaje cuando cambie el estado del mensaje
+    useEffect(() => {
+        if (message) {
+            setShowMessageDialog(true);
+        }
+    }, [message]);
+
+    const closeMessageDialog = () => {
+        setShowMessageDialog(false);
+        // Si fue exitoso, recargar la página para mostrar la nueva entrevista programada
+        if (message?.type === 'success') {
+            window.location.reload();
+        }
+    };
+
     return (
         <>
+            {/* Alert Dialog para mostrar mensajes */}
+            <AlertDialog open={showMessageDialog} onOpenChange={setShowMessageDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className={`flex items-center space-x-2 ${
+                            message?.type === 'success' ? 'text-green-700' : 'text-red-700'
+                        }`}>
+                            {message?.type === 'success' ? (
+                                <>
+                                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>¡Éxito!</span>
+                                </>
+                            ) : (
+                                <>
+                                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                    </svg>
+                                    <span>Error</span>
+                                </>
+                            )}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-base">
+                            {message?.text}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogAction
+                            onClick={closeMessageDialog}
+                            className={`${
+                                message?.type === 'success' 
+                                    ? 'bg-green-600 hover:bg-green-700' 
+                                    : 'bg-red-600 hover:bg-red-700'
+                            } text-white`}
+                        >
+                            Entendido
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
             {/* Mostrar entrevista programada si existe */}
             {myScheduledInterview ? (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
@@ -120,27 +181,6 @@ export const InterviewForm = ({interviewAvailabilities,token,myScheduledIntervie
                 <>
                     {/* Mensaje informativo */}
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-                        {/* Mensaje de resultado */}
-                        {message && (
-                            <div className={`mb-6 p-4 rounded-lg border ${
-                                message.type === 'success'
-                                    ? 'bg-green-50 border-green-200 text-green-800'
-                                    : 'bg-red-50 border-red-200 text-red-800'
-                            }`}>
-                                <div className="flex items-center space-x-3">
-                                    {message.type === 'success' ? (
-                                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    ) : (
-                                        <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    )}
-                                    <span className="font-medium">{message.text}</span>
-                                </div>
-                            </div>
-                        )}
                         <h2 className="text-xl font-bold text-gray-900 mb-6">
                             Selecciona tu horario preferido
                         </h2>
