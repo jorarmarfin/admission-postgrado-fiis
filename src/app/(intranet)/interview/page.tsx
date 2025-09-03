@@ -19,7 +19,6 @@ export default async function InterviewPage() {
     const interviewAvailabilities: IInterviewAvailability[] = await interviewAvailabilitiesService.getInterviewAvailabilities(token);
     const applicantDetails: IApplicantDetails = await applicantService.getApplicantDetails(token);
     const myScheduledInterview: IInterviewAppointment[] = await interviewAppointmentService.getInterviewAppointments(token);
-
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
