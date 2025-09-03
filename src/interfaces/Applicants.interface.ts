@@ -1,4 +1,6 @@
-import {IAcademicPeriodDetail, IProgramDetail, IStudent} from "@/interfaces/Application.interface";
+import {IProgramDetail} from "@/interfaces/Program.interface";
+import {IStudent} from "@/interfaces/Student.interface";
+import {IAcademicPeriodDetail} from "@/interfaces/AcademicPeriod.interface";
 
 export interface IApplicantDetails {
     id: number;

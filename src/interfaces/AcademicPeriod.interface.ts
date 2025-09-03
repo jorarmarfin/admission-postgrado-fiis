@@ -10,3 +10,10 @@ export interface ApiResponse<T> {
     data: T;
     message?: string;
 }
+
+export interface IAcademicPeriodDetail {
+    id: number;
+    name: string;
+    admission: boolean;
+    active: boolean;
+}

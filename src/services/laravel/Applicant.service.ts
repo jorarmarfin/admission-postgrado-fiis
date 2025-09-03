@@ -1,10 +1,8 @@
 import {
-    IApplicationRequest,
-    IApplicationResponse,
     IUploadDocumentResponse,
     IApplicantDocumentsResponse,
     IApplicantDetailsResponse,
-    IApplicantDetails
+    IApplicantDetails, IApplicationRequest, IApplicationResponse
 } from "@/interfaces";
 
 const SERVER_BASE = process.env.NEXT_BACKEND_API_URL;            // solo server
