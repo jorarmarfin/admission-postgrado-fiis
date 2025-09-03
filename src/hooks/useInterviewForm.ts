@@ -42,7 +42,7 @@ export const useInterviewForm = (
 
     // Convertir los datos del API a formato local
     const convertirHorariosAPI = (): HorarioDisponible[] => {
-        return interviewerAvailabilities.map((availability, index) => {
+        return interviewerAvailabilities.map((availability) => {
             const fechaCompleta = new Date(availability.interviewer_start_at)
             const fecha = fechaCompleta.toLocaleDateString('es-ES', {
                 weekday: 'long',
@@ -131,7 +131,7 @@ export const useInterviewForm = (
                 setShowDialog(false);
             }
         } catch (error) {
-            setMessage({ type: 'error', text: 'Error inesperado. Por favor, inténtalo de nuevo.' });
+            setMessage({ type: 'error', text: 'Error inesperado. Por favor, inténtalo de nuevo.'+error });
             setShowDialog(false);
         } finally {
             setIsLoading(false);

@@ -1,7 +1,6 @@
 import {
     ICreateInterviewAppointmentRequest,
     ICreateInterviewAppointmentResponse,
-    IGetInterviewAppointmentsResponse,
     ApiResponse,
     IInterviewAppointment
 } from "@/interfaces";

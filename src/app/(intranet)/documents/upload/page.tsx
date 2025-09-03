@@ -4,8 +4,6 @@ import {authOptions} from "@/lib/auth";
 import {Metadata} from "next";
 import {IApplicantDetails, IApplicantDocumentsResponse} from "@/interfaces";
 import {applicantService} from "@/services";
-import {Button} from "@/components/ui/button";
-import Link from "next/link";
 
 export const metadata: Metadata = {
     title: "Cargar Documentos - FIIS UNI",

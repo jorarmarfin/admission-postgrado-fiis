@@ -4,8 +4,6 @@ import {getServerSession} from "next-auth";
 import {authOptions} from "@/lib/auth";
 import {IApplicantDetails, IInterviewAppointment, IInterviewAvailability} from "@/interfaces";
 import {Metadata} from "next";
-import Link from "next/link";
-import {Button} from "@/components/ui/button";
 
 export const metadata: Metadata = {
     title: "Entrevistas - FIIS UNI",

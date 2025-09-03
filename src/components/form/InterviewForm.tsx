@@ -12,7 +12,6 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import Link from "next/link"
 import { useInterviewForm } from "@/hooks"
 import {IInterviewAvailability} from "@/interfaces";
 import { useEffect, useState } from "react";
