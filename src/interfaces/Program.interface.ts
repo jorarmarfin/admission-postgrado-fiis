@@ -12,3 +12,11 @@ export interface IProgram {
     program_type_id: number;
     program_types: IProgramType;
 }
+
+export interface IProgramDetail {
+    id: number;
+    uuid: string;
+    name: string;
+    description: string;
+    program_type_id: number;
+}
