@@ -120,6 +120,27 @@ export const InterviewForm = ({interviewAvailabilities,token,myScheduledIntervie
                 <>
                     {/* Mensaje informativo */}
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                        {/* Mensaje de resultado */}
+                        {message && (
+                            <div className={`mb-6 p-4 rounded-lg border ${
+                                message.type === 'success'
+                                    ? 'bg-green-50 border-green-200 text-green-800'
+                                    : 'bg-red-50 border-red-200 text-red-800'
+                            }`}>
+                                <div className="flex items-center space-x-3">
+                                    {message.type === 'success' ? (
+                                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    ) : (
+                                        <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    )}
+                                    <span className="font-medium">{message.text}</span>
+                                </div>
+                            </div>
+                        )}
                         <h2 className="text-xl font-bold text-gray-900 mb-6">
                             Selecciona tu horario preferido
                         </h2>
