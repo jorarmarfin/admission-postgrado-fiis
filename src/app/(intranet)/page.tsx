@@ -23,8 +23,6 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-
-
       {/* Contenido principal */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Saludo y bienvenida */}
@@ -41,30 +39,6 @@ export default async function Home() {
             <p className="text-gray-500 mt-2">
               Universidad Nacional de Ingeniería - Facultad de Ingeniería Industrial y de Sistemas
             </p>
-          </div>
-
-          {/* Estado del proceso */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-blue-900">Estado del Proceso</h3>
-                  <p className="text-blue-700 text-sm">Documentación pendiente</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-sm font-medium text-blue-900">Progreso</div>
-                <div className="w-32 bg-blue-200 rounded-full h-2 mt-1">
-                  <div className="bg-blue-600 h-2 rounded-full w-1/3"></div>
-                </div>
-                <div className="text-xs text-blue-700 mt-1">33% completado</div>
-              </div>
-            </div>
           </div>
         </div>
 

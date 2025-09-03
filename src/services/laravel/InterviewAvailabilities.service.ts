@@ -1,19 +1,16 @@
-import { ApiResponse, IInterviewerAvailability } from "@/interfaces";
+import { ApiResponse, IInterviewAvailability } from "@/interfaces";
 
-const SERVER_BASE = process.env.NEXT_BACKEND_API_URL;            // solo server
-const CLIENT_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-export const API_BASE_URL =
-    typeof window === 'undefined' ? SERVER_BASE : CLIENT_BASE;
+const API_BASE_URL = process.env.NEXT_BACKEND_API_URL;
 
-export const interviewerAvailabilitiesService = {
+export const interviewAvailabilitiesService = {
     /**
      * Obtiene la lista de disponibilidades de entrevistadores
      * @param token - Token de autorización Bearer
      * @returns Promise con la lista de disponibilidades
      */
-    async getInterviewerAvailabilities(token: string): Promise<IInterviewerAvailability[]> {
+    async getInterviewAvailabilities(token: string): Promise<IInterviewAvailability[]> {
         try {
-            const response = await fetch(`${API_BASE_URL}/interviewer-availabilities`, {
+            const response = await fetch(`${API_BASE_URL}/admission/interview-availabilities`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -27,7 +24,7 @@ export const interviewerAvailabilitiesService = {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const result: ApiResponse<IInterviewerAvailability[]> = await response.json();
+            const result: ApiResponse<IInterviewAvailability[]> = await response.json();
 
             if (result.status !== 'success') {
                 throw new Error('Error en la respuesta del servidor');

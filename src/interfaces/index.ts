@@ -7,4 +7,6 @@ export * from './DocumentType.interface';
 export * from './Login.interface';
 export * from './Program.interface';
 export * from './University.interface';
-export * from './InterviewerAvailability';
+export * from './InterviewAvailability';
+export * from './InterviewAppointment.interface';
+export * from './Applicants.interface';

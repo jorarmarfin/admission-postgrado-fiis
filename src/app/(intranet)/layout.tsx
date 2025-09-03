@@ -13,11 +13,13 @@ export default function IntranetLayout({ children }: { children: React.ReactNode
                         <div className="flex items-center space-x-4">
                             {/* Sustituye el logo por la imagen */}
                             <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center bg-white border border-gray-200">
+                                <Link href="/">
                                 <LogoUni/>
+                                </Link>
                             </div>
                             <div>
                                 <h1 className="text-xl font-bold text-red-800">
-                                    Admisión Postgrado
+                                    Admisión Posgrado
                                 </h1>
                                 <p className="text-sm text-gray-600">
                                     Universidad Nacional de Ingeniería <br/>
