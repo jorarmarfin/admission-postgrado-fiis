@@ -106,3 +106,8 @@ export interface IUserApplicationsResponse {
     status: "success";
     data: IUserApplication[];
 }
+
+
+
+// Interface para la respuesta de detalles del solicitante
+

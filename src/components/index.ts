@@ -1,3 +1,4 @@
+export {HeaderComponent} from "@/components/ui/header";
 export {Image404} from "@/components/ui/img-404";
 export {LogoUni} from "@/components/ui/logo-uni";
 export {InterviewForm} from "@/components/form/InterviewForm";

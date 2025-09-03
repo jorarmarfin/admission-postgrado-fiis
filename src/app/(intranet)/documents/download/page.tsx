@@ -4,7 +4,8 @@ import {Metadata} from "next";
 import {authOptions} from "@/lib/auth";
 import {getServerSession} from "next-auth";
 import {applicantService, programService} from "@/services";
-import {IProgramDocumentsResponse, IUserApplicationsResponse} from "@/interfaces";
+import {IApplicantDetails, IProgramDocumentsResponse} from "@/interfaces";
+import {HeaderComponent} from "@/components";
 
 export const metadata: Metadata = {
     title: "Descargar Documentos - Admisión Postgrado",
@@ -15,11 +16,8 @@ export const metadata: Metadata = {
 export default async function DocumentsDownloadPage() {
     const session = await getServerSession(authOptions);
     const token = session?.accessToken ?? '';
-    const userId = session?.user?.id ?? '';
-
-    // Convertir userId de string a number ya que el API espera number
-    const applicantData: IUserApplicationsResponse = await applicantService.getUserApplications(parseInt(userId), token);
-    const documents: IProgramDocumentsResponse = await programService.getProgramDocuments(applicantData.data[0].program.id, token);
+    const applicantDetails: IApplicantDetails = await applicantService.getApplicantDetails(token);
+    const documents: IProgramDocumentsResponse = await programService.getProgramDocuments(applicantDetails.program.id, token);
 
 
 
@@ -72,40 +70,10 @@ export default async function DocumentsDownloadPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
-            <div className="max-w-6xl mx-auto">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* Header */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center space-x-4">
-                            <div className="w-16 h-16 bg-red-800 rounded-full flex items-center justify-center">
-                                <div className="w-12 h-12 border-3 border-white rounded-full flex items-center justify-center">
-                                    <span className="text-white font-bold text-xs">UNI</span>
-                                </div>
-                            </div>
-                            <div>
-                                <h1 className="text-3xl font-bold text-red-800 mb-1">
-                                    Documentos para Descarga
-                                </h1>
-                                <p className="text-lg text-gray-600">
-                                    Proceso de Admisión Postgrado {applicantData?.data[0].academic_period.name}
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                    {applicantData?.data[0].program.name}
-                                </p>
-                            </div>
-                        </div>
-                        <Link href="/">
-                            <Button variant="outline" className="border-red-800 text-red-800 hover:bg-red-50">
-                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                                </svg>
-                                Volver al Inicio
-                            </Button>
-                        </Link>
-                    </div>
-                </div>
-
+                <HeaderComponent period={applicantDetails.program.name} program={applicantDetails.program.name} />
                 {/* Instrucciones */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-8 mb-8">
                     <div className="flex items-start space-x-4">

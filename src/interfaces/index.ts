@@ -9,3 +9,4 @@ export * from './Program.interface';
 export * from './University.interface';
 export * from './InterviewAvailability';
 export * from './InterviewAppointment.interface';
+export * from './Applicants.interface';
