@@ -18,10 +18,11 @@ import {IInterviewAvailability} from "@/interfaces";
 
 interface Props{
     interviewAvailabilities: IInterviewAvailability[]
+    myScheduledInterview: IInterviewAvailability | null
     token: string
 }
 
-export const InterviewForm = ({interviewAvailabilities,token}: Props) => {
+export const InterviewForm = ({interviewAvailabilities,token,myScheduledInterview}: Props) => {
     const {
         horarioSeleccionado,
         showDialog,

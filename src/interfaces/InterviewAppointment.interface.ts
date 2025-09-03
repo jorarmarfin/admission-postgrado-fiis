@@ -1,9 +1,12 @@
+import {IInterviewAvailability} from "@/interfaces/InterviewAvailability";
+
 export interface IInterviewAppointment {
     applicant_id: number;
     interviewer_availabilitie_id: number;
     status: string;
     booked_at: string;
     id: number;
+    interviewer_availability: IInterviewAvailability
 }
 
 export interface ICreateInterviewAppointmentRequest {
@@ -16,4 +19,10 @@ export interface ICreateInterviewAppointmentResponse {
     data?: {
         appointment: IInterviewAppointment;
     };
+}
+
+export interface IGetInterviewAppointmentsResponse {
+    status: "success" | "error";
+    message?: string;
+    data?: IInterviewAppointment[];
 }

@@ -1,4 +1,10 @@
-import {ICreateInterviewAppointmentRequest, ICreateInterviewAppointmentResponse} from "@/interfaces";
+import {
+    ICreateInterviewAppointmentRequest,
+    ICreateInterviewAppointmentResponse,
+    IGetInterviewAppointmentsResponse,
+    ApiResponse,
+    IInterviewAppointment
+} from "@/interfaces";
 
 const SERVER_BASE = process.env.NEXT_BACKEND_API_URL;
 const CLIENT_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -39,5 +45,41 @@ export const interviewAppointmentService = {
                 message: "Error de conexión con el servidor. Inténtalo más tarde."
             };
         }
-    }
+    },
+
+    /**
+     * Obtiene las citas de entrevista
+     * @param token - Token de autorización Bearer
+     * @returns Promise con el array de citas de entrevista
+     */
+    async getInterviewAppointments(
+        token: string
+    ): Promise<IInterviewAppointment[]> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admission/interview-appointments`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result: ApiResponse<IInterviewAppointment[]> = await response.json();
+
+            if (result.status !== 'success') {
+                throw new Error('Error en la respuesta del servidor');
+            }
+
+            return result.data;
+
+        } catch (error) {
+            console.error('Error al obtener las citas de entrevista:', error);
+            throw error;
+        }
+    },
 };
