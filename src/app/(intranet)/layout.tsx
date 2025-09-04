@@ -1,60 +1,56 @@
 import Link from "next/link";
 import React from "react";
-import {LogoUni, LogoutButton} from "@/components"; // Importa el componente Image
+import {LogoUni, LogoutButton, MobileMenu} from "@/components";
 
 export default function IntranetLayout({ children }: { children: React.ReactNode }) {
     return (
         <>
             {/* Header */}
-            <header className="bg-white shadow-sm border-b border-gray-200">
+            <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-20">
                         {/* Logo y título */}
-                        <div className="flex items-center space-x-4">
-                            {/* Sustituye el logo por la imagen */}
-                            <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center bg-white border border-gray-200">
+                        <div className="flex items-center space-x-3 flex-1 min-w-0">
+                            {/* Logo */}
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden flex items-center justify-center bg-white border border-gray-200 flex-shrink-0">
                                 <Link href="/">
-                                <LogoUni/>
+                                    <LogoUni/>
                                 </Link>
                             </div>
-                            <div>
-                                <h1 className="text-xl font-bold text-red-800">
+                            {/* Título - responsive */}
+                            <div className="min-w-0 flex-1">
+                                <h1 className="text-lg sm:text-xl font-bold text-red-800 truncate">
                                     Admisión Posgrado
                                 </h1>
-                                <p className="text-sm text-gray-600">
-                                    Universidad Nacional de Ingeniería <br/>
+                                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">
+                                    Universidad Nacional de Ingeniería <br className="hidden lg:block"/>
+                                    <span className="lg:hidden">- </span>
                                     Facultad de Ingeniería Industrial y de Sistemas
+                                </p>
+                                <p className="text-xs text-gray-600 sm:hidden truncate">
+                                    UNI - FIIS
                                 </p>
                             </div>
                         </div>
 
-                        {/* Navegación */}
-                        <nav className="hidden md:flex items-center space-x-6">
+                        {/* Navegación Desktop - solo Inicio y botón Cerrar */}
+                        <nav className="hidden md:flex items-center space-x-6 flex-shrink-0">
                             <Link href="/" className="text-gray-700 hover:text-red-800 font-medium transition-colors">
                                 Inicio
                             </Link>
-                            <Link href="/" className="text-gray-700 hover:text-red-800 font-medium transition-colors">
-                                Descargar Documentos
-                            </Link>
                             <div className="border-l border-gray-300 pl-6">
-                                <LogoutButton className='bg-red-800 text-white
-                                hover:bg-red-500 hover:text-white
-                                cursor-pointer'/>
+                                <LogoutButton className='bg-red-800 text-white hover:bg-red-500 hover:text-white cursor-pointer'/>
                             </div>
                         </nav>
 
-                        {/* Menu móvil */}
-                        <div className="md:hidden">
-                            <button className="text-gray-700 hover:text-red-800 p-2">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
-                            </button>
+                        {/* Menú móvil - componente MobileMenu */}
+                        <div className="flex-shrink-0 ml-3">
+                            <MobileMenu />
                         </div>
                     </div>
                 </div>
             </header>
-            <main>
+            <main className="min-h-screen">
                 {children}
             </main>
             {/* Footer */}
