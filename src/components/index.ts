@@ -9,3 +9,4 @@ export {AuthProvider} from "@/components/auths/auth-provider";
 export {LogoutButton} from "@/components/auths/logout-button";
 export {ProgramDocuments} from "@/components/programs/program-documents";
 export {ProgramDetails} from "@/components/programs/program-details";
+export {default as MobileMenu} from "@/components/ui/mobile-menu";

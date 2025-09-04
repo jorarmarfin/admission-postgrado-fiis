@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import {LogoUni, LogoutButton} from "@/components"; // Importa el componente Image
+import {LogoUni, LogoutButton, MobileMenu} from "@/components";
 
 export default function IntranetLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -14,7 +14,7 @@ export default function IntranetLayout({ children }: { children: React.ReactNode
                             {/* Sustituye el logo por la imagen */}
                             <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center bg-white border border-gray-200">
                                 <Link href="/">
-                                <LogoUni/>
+                                    <LogoUni/>
                                 </Link>
                             </div>
                             <div>
@@ -28,29 +28,18 @@ export default function IntranetLayout({ children }: { children: React.ReactNode
                             </div>
                         </div>
 
-                        {/* Navegación */}
+                        {/* Navegación Desktop - solo Inicio y botón Cerrar */}
                         <nav className="hidden md:flex items-center space-x-6">
                             <Link href="/" className="text-gray-700 hover:text-red-800 font-medium transition-colors">
                                 Inicio
                             </Link>
-                            <Link href="/" className="text-gray-700 hover:text-red-800 font-medium transition-colors">
-                                Descargar Documentos
-                            </Link>
                             <div className="border-l border-gray-300 pl-6">
-                                <LogoutButton className='bg-red-800 text-white
-                                hover:bg-red-500 hover:text-white
-                                cursor-pointer'/>
+                                <LogoutButton className='bg-red-800 text-white hover:bg-red-500 hover:text-white cursor-pointer'/>
                             </div>
                         </nav>
 
-                        {/* Menu móvil */}
-                        <div className="md:hidden">
-                            <button className="text-gray-700 hover:text-red-800 p-2">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
-                            </button>
-                        </div>
+                        {/* Menú móvil - componente MobileMenu */}
+                        <MobileMenu />
                     </div>
                 </div>
             </header>

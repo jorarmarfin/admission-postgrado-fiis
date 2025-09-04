@@ -52,7 +52,6 @@ export const InterviewForm = ({interviewAvailabilities,token,myScheduledIntervie
             window.location.reload();
         }
     };
-    console.log(myScheduledInterview);
     return (
         <>
             {/* Alert Dialog para mostrar mensajes */}
