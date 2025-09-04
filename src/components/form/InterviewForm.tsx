@@ -13,12 +13,12 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useInterviewForm } from "@/hooks"
-import {IInterviewAvailability} from "@/interfaces";
+import {IInterviewAppointment, IInterviewAvailability} from "@/interfaces";
 import { useEffect, useState } from "react";
 
 interface Props{
     interviewAvailabilities: IInterviewAvailability[]
-    myScheduledInterview: IInterviewAvailability | null
+    myScheduledInterview: IInterviewAppointment[] | null
     token: string
 }
 
@@ -52,7 +52,7 @@ export const InterviewForm = ({interviewAvailabilities,token,myScheduledIntervie
             window.location.reload();
         }
     };
-
+    console.log(myScheduledInterview);
     return (
         <>
             {/* Alert Dialog para mostrar mensajes */}
@@ -113,7 +113,7 @@ export const InterviewForm = ({interviewAvailabilities,token,myScheduledIntervie
                         <div>
                             <span className="font-medium text-blue-900">Fecha:</span>
                             <p className="text-blue-800 capitalize">
-                                {new Date(myScheduledInterview.interviewer_start_at).toLocaleDateString('es-ES', {
+                                {new Date(myScheduledInterview[0].interviewer_start_at).toLocaleDateString('es-ES', {
                                     weekday: 'long',
                                     year: 'numeric',
                                     month: 'long',
@@ -124,7 +124,7 @@ export const InterviewForm = ({interviewAvailabilities,token,myScheduledIntervie
                         <div>
                             <span className="font-medium text-blue-900">Hora:</span>
                             <p className="text-blue-800">
-                                {new Date(myScheduledInterview.interviewer_start_at).toLocaleTimeString('es-ES', {
+                                {new Date(myScheduledInterview[0].interviewer_start_at).toLocaleTimeString('es-ES', {
                                     hour: '2-digit',
                                     minute: '2-digit'
                                 })}
@@ -132,35 +132,31 @@ export const InterviewForm = ({interviewAvailabilities,token,myScheduledIntervie
                         </div>
                         <div>
                             <span className="font-medium text-blue-900">Entrevistador:</span>
-                            <p className="text-blue-800">{myScheduledInterview.professor_name}</p>
+                            <p className="text-blue-800">{myScheduledInterview[0].professor_last_name} {myScheduledInterview[0].professor_first_name}</p>
                         </div>
                         <div>
                             <span className="font-medium text-blue-900">Programa:</span>
-                            <p className="text-blue-800">{myScheduledInterview.program_name}</p>
-                        </div>
-                        <div>
-                            <span className="font-medium text-blue-900">Período:</span>
-                            <p className="text-blue-800">{myScheduledInterview.academic_period_name}</p>
+                            <p className="text-blue-800">{myScheduledInterview[0].program_name}</p>
                         </div>
                         <div>
                             <span className="font-medium text-blue-900">Modalidad:</span>
-                            <p className="text-blue-800">{myScheduledInterview.mode}</p>
+                            <p className="text-blue-800">{myScheduledInterview[0].mode}</p>
                         </div>
                         <div>
                             <span className="font-medium text-blue-900">Ubicación:</span>
-                            <p className="text-blue-800">{myScheduledInterview.location}</p>
+                            <p className="text-blue-800">{myScheduledInterview[0].location}</p>
                         </div>
-                        {myScheduledInterview.meeting_link && (
+                        {myScheduledInterview[0].meeting_link && (
                             <div className="md:col-span-2">
                                 <span className="font-medium text-blue-900">Enlace de reunión:</span>
                                 <p className="text-blue-800">
                                     <a
-                                        href={myScheduledInterview.meeting_link}
+                                        href={myScheduledInterview[0].meeting_link}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-blue-600 hover:text-blue-800 underline"
                                     >
-                                        {myScheduledInterview.meeting_link}
+                                        {myScheduledInterview[0].meeting_link}
                                     </a>
                                 </p>
                             </div>

@@ -73,7 +73,7 @@ export default async function DocumentsDownloadPage() {
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* Header */}
-                <HeaderComponent period={applicantDetails.program.name} program={applicantDetails.program.name} />
+                <HeaderComponent period={applicantDetails.academic_period.name} program={applicantDetails.program.name} />
                 {/* Instrucciones */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-8 mb-8">
                     <div className="flex items-start space-x-4">

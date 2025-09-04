@@ -19,13 +19,13 @@ export default async function InterviewPage() {
     const myScheduledInterview: IInterviewAppointment[] = await interviewAppointmentService.getInterviewAppointments(token);
 
     // Si no hay entrevistas programadas, enviar null
-    const scheduledInterview = myScheduledInterview.length > 0 ? myScheduledInterview[0].interviewer_availability : null;
+    const scheduledInterview:IInterviewAppointment[]|null = myScheduledInterview.length > 0 ? myScheduledInterview : null;
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* Header */}
-                <HeaderComponent period={applicantDetails.program.name} program={applicantDetails.program.name}/>
+                <HeaderComponent period={applicantDetails.academic_period.name} program={applicantDetails.program.name} />
 
                 {/* Selección de horario */}
                 <InterviewForm
