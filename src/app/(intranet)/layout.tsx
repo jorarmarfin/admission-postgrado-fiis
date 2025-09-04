@@ -6,30 +6,35 @@ export default function IntranetLayout({ children }: { children: React.ReactNode
     return (
         <>
             {/* Header */}
-            <header className="bg-white shadow-sm border-b border-gray-200">
+            <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-20">
                         {/* Logo y título */}
-                        <div className="flex items-center space-x-4">
-                            {/* Sustituye el logo por la imagen */}
-                            <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center bg-white border border-gray-200">
+                        <div className="flex items-center space-x-3 flex-1 min-w-0">
+                            {/* Logo */}
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden flex items-center justify-center bg-white border border-gray-200 flex-shrink-0">
                                 <Link href="/">
                                     <LogoUni/>
                                 </Link>
                             </div>
-                            <div>
-                                <h1 className="text-xl font-bold text-red-800">
+                            {/* Título - responsive */}
+                            <div className="min-w-0 flex-1">
+                                <h1 className="text-lg sm:text-xl font-bold text-red-800 truncate">
                                     Admisión Posgrado
                                 </h1>
-                                <p className="text-sm text-gray-600">
-                                    Universidad Nacional de Ingeniería <br/>
+                                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">
+                                    Universidad Nacional de Ingeniería <br className="hidden lg:block"/>
+                                    <span className="lg:hidden">- </span>
                                     Facultad de Ingeniería Industrial y de Sistemas
+                                </p>
+                                <p className="text-xs text-gray-600 sm:hidden truncate">
+                                    UNI - FIIS
                                 </p>
                             </div>
                         </div>
 
                         {/* Navegación Desktop - solo Inicio y botón Cerrar */}
-                        <nav className="hidden md:flex items-center space-x-6">
+                        <nav className="hidden md:flex items-center space-x-6 flex-shrink-0">
                             <Link href="/" className="text-gray-700 hover:text-red-800 font-medium transition-colors">
                                 Inicio
                             </Link>
@@ -39,11 +44,13 @@ export default function IntranetLayout({ children }: { children: React.ReactNode
                         </nav>
 
                         {/* Menú móvil - componente MobileMenu */}
-                        <MobileMenu />
+                        <div className="flex-shrink-0 ml-3">
+                            <MobileMenu />
+                        </div>
                     </div>
                 </div>
             </header>
-            <main>
+            <main className="min-h-screen">
                 {children}
             </main>
             {/* Footer */}
