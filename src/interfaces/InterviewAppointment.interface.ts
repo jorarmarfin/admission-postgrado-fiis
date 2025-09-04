@@ -1,12 +1,13 @@
-import {IInterviewAvailability} from "@/interfaces/InterviewAvailability";
 
 export interface IInterviewAppointment {
-    applicant_id: number;
-    interviewer_availabilitie_id: number;
-    status: string;
-    booked_at: string;
-    id: number;
-    interviewer_availability: IInterviewAvailability
+    interviewer_start_at: string;
+    interviewer_end_at: string;
+    mode: string;
+    location: string;
+    meeting_link: string;
+    program_name: string;
+    professor_first_name: string;
+    professor_last_name: string;
 }
 
 export interface ICreateInterviewAppointmentRequest {
