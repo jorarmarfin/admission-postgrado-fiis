@@ -17,7 +17,6 @@ export default async function InterviewPage() {
     const interviewAvailabilities: IInterviewAvailability[] = await interviewAvailabilitiesService.getInterviewAvailabilities(token);
     const applicantDetails: IApplicantDetails = await applicantService.getApplicantDetails(token);
     const myScheduledInterview: IInterviewAppointment[] = await interviewAppointmentService.getInterviewAppointments(token);
-
     // Si no hay entrevistas programadas, enviar null
     const scheduledInterview:IInterviewAppointment[]|null = myScheduledInterview.length > 0 ? myScheduledInterview : null;
 
