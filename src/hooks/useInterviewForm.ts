@@ -44,6 +44,7 @@ export const useInterviewForm = (
     const convertirHorariosAPI = (): HorarioDisponible[] => {
         return interviewerAvailabilities.map((availability) => {
             const fechaCompleta = new Date(availability.interviewer_start_at)
+            const fechaFin = new Date(availability.interviewer_end_at)
             const fecha = fechaCompleta.toLocaleDateString('es-ES', {
                 weekday: 'long',
                 year: 'numeric',
@@ -55,12 +56,27 @@ export const useInterviewForm = (
                 minute: '2-digit',
                 hour12: false
             })
+            const fecha2 = fechaFin.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            })
+            const hora2 = fechaFin.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                }
+            )
+            console.log(hora2);
 
             return {
                 id: `${availability.interviewer_start_at}-${availability.professor_name}`,
                 fecha: fecha,
+                fecha2: fecha2,
                 fechaCompleta: fechaCompleta,
+                fechaFin: fecha2,
                 hora: hora,
+                hora2: hora2,
                 disponible: availability.capacity > 0,
                 profesorNombre: availability.professor_name,
                 programaNombre: availability.program_name,

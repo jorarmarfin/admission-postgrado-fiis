@@ -218,7 +218,7 @@ export const InterviewForm = ({interviewAvailabilities,token,myScheduledIntervie
                                                     `}
                                                     >
                                                         <div className="font-semibold text-lg mb-1">
-                                                            {horario.hora}
+                                                            {horario.hora} - {horario.hora2}
                                                         </div>
                                                         <div className={`text-sm mb-2 ${horarioSeleccionado?.id === horario.id ? 'text-red-100' : 'text-gray-600'}`}>
                                                             {horario.profesorNombre}
