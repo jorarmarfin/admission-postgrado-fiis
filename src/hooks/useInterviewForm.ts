@@ -113,7 +113,7 @@ export const useInterviewForm = (
 
         try {
             const appointmentData: ICreateInterviewAppointmentRequest = {
-                interviewer_availabilitie_id: horarioSeleccionado.availabilityId
+                interviewer_availability_id: horarioSeleccionado.availabilityId
             };
 
             const result = await interviewAppointmentService.createInterviewAppointment(

@@ -11,7 +11,7 @@ export interface IInterviewAppointment {
 }
 
 export interface ICreateInterviewAppointmentRequest {
-    interviewer_availabilitie_id: number;
+    interviewer_availability_id: number;
 }
 
 export interface ICreateInterviewAppointmentResponse {
