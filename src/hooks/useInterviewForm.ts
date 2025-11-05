@@ -7,6 +7,9 @@ interface HorarioDisponible {
     fecha: string
     fechaCompleta: Date
     hora: string
+    fecha2: string
+    fechaFin: string
+    hora2: string
     disponible: boolean
     profesorNombre: string
     programaNombre: string

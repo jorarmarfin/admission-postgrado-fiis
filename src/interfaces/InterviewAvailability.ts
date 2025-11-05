@@ -1,6 +1,7 @@
 export interface IInterviewAvailability {
     id: number;
     interviewer_start_at: string;
+    interviewer_end_at: string;
     professor_name: string;
     academic_period_name: string;
     program_name: string;
