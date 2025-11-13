@@ -2,7 +2,7 @@ import {
     IUploadDocumentResponse,
     IApplicantDocumentsResponse,
     IApplicantDetailsResponse,
-    IApplicantDetails, IApplicationRequest, IApplicationResponse
+    IApplicantDetails, IApplicationRequest, IApplicationResponse, IApplicantCanRegisterForInterviews
 } from "@/interfaces";
 
 const SERVER_BASE = process.env.NEXT_BACKEND_API_URL;            // solo server
@@ -161,6 +161,40 @@ export const applicantService = {
         } catch (error) {
             console.error('Error al obtener los detalles del solicitante:', error);
             throw new Error('Error al cargar los detalles del solicitante');
+        }
+    },
+
+    /**
+     * Verifica si el solicitante puede registrarse para entrevistas
+     * @param token - Token de autorización Bearer
+     * @returns Promise con el estado de aprobación de documentos
+     */
+    async canRegisterForInterviews(token: string): Promise<boolean> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admission/applicant-document-approved`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                cache: 'no-store'
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result: IApplicantCanRegisterForInterviews = await response.json();
+
+            if (result.status !== 'success') {
+                throw new Error('Error en la respuesta del servidor');
+            }
+
+            return result.data;
+        } catch (error) {
+            console.error('Error al verificar aprobación de documentos:', error);
+            throw new Error('Error al verificar si puede registrarse para entrevistas');
         }
     }
 };
