@@ -81,8 +81,8 @@ export default async function InterviewPage() {
                         <div className="flex-1">
                             <h3 className="font-semibold text-yellow-900 mb-2">Instrucciones Importantes</h3>
                             <ul className="text-sm text-yellow-800 space-y-1">
-                                <li>• Llega 5 minutos antes de tu cita programada</li>
-                                <li>• Trae tu DNI original y copia de todos los documentos enviados</li>
+                                <li>• Ingresa 5 minutos antes de tu cita programada</li>
+                                <li>• Tener a la mano tu DNI</li>
                                 <li>• La entrevista será evaluada por el comité académico</li>
                                 <li>• Si necesitas reprogramar, contacta con 48 horas de anticipación</li>
                             </ul>
