@@ -5,6 +5,41 @@ const API_BASE_URL = process.env.NEXT_BACKEND_API_URL;
 
 export const programService = {
     /**
+     * Obtiene todos los programas disponibles
+     * @returns Promise con la lista de programas
+     */
+    async getAllPrograms(): Promise<IProgram[]> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admission/programs`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                next: { tags: ['programs'], revalidate: 60 * 60 }, // Cache por 1 hora
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data: ApiResponse<IProgram[]> = await response.json();
+
+            if (data.status !== 'success') {
+                throw new Error('Error al obtener los programas');
+            }
+
+            return data.data;
+        } catch (error) {
+            console.error('Error fetching programs:', error);
+            if (error instanceof Error) {
+                throw new Error(`No se pudieron obtener los programas: ${error.message}`);
+            }
+            throw new Error('No se pudieron obtener los programas');
+        }
+    },
+
+    /**
      * Obtiene un programa por su UUID
      * @param uuid - UUID del programa
      * @returns Promise con los datos del programa
