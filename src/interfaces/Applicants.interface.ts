@@ -20,3 +20,8 @@ export interface IApplicantDetailsResponse{
     status: "success";
     data: IApplicantDetails;
 }
+
+export interface IApplicantCanRegisterForInterviews{
+    status: "success";
+    data: boolean
+}
