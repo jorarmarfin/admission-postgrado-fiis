@@ -97,15 +97,12 @@ export default async function Home() {
               <div className="space-y-2 mb-6">
                 <div className="flex items-center justify-between text-sm">
                   <span>• Certificados académicos</span>
-                  <span className="text-orange-500">Pendiente</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span>• Documento de identidad</span>
-                  <span className="text-orange-500">Pendiente</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span>• Foto tipo carnet</span>
-                  <span className="text-orange-500">Pendiente</span>
                 </div>
               </div>
               <Link href="/documents/upload">
