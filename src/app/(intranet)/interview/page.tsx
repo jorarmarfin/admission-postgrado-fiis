@@ -61,7 +61,7 @@ export default async function InterviewPage() {
                                 </ol>
                                 <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
                                     <p className="text-blue-800 font-medium">
-                                        Una vez que tus documentos sean aprobados, podrás agendar tu entrevista.
+                                        En la primera semana de marzo se habilitará el registro para entrevistas.
                                     </p>
                                 </div>
                             </div>
