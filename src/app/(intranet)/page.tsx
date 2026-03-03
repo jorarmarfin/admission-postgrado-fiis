@@ -157,22 +157,12 @@ export default async function Home() {
                 Fechas Importantes
               </h3>
               <div className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600">Inicio de inscripciones</span>
-                  <span className="font-medium text-red-800">15 Enero 2026</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600">Cierre de inscripciones</span>
-                  <span className="font-medium text-red-800">28 Febrero 2026</span>
-                </div>
+
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-600">Entrevistas</span>
-                  <span className="font-medium text-red-800">1-15 Marzo 2026</span>
+                  <span className="font-medium text-red-800">9-22 Marzo 2026</span>
                 </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">Publicación de resultados</span>
-                  <span className="font-medium text-red-800">30 Marzo 2026</span>
-                </div>
+
               </div>
             </div>
 
