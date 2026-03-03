@@ -130,20 +130,16 @@ export default async function Home() {
               <div className="space-y-2 mb-6">
                 <div className="flex items-center justify-between text-sm text-gray-400">
                   <span>• Modalidad: Presencial/Virtual</span>
-                  <span>Disponible pronto</span>
+                  <span>Disponible</span>
                 </div>
                 <div className="flex items-center justify-between text-sm text-gray-400">
-                  <span>• Duración: 30 minutos</span>
-                  <span>---</span>
-                </div>
-                <div className="flex items-center justify-between text-sm text-gray-400">
-                  <span>• Horario: L-V 9am-5pm</span>
+                  <span>• Duración: 20 minutos</span>
                   <span>---</span>
                 </div>
               </div>
               <Link href="/interview">
                 <Button
-                  className="w-full bg-gray-400 text-white cursor-not-allowed"
+                  className="w-full bg-gray-500 text-white cursor-not-allowed"
                   disabled
                 >
                   Completar Documentos Primero
