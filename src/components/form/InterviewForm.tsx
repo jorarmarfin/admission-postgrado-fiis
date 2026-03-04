@@ -125,7 +125,8 @@ export const InterviewForm = ({interviewAvailabilities,token,myScheduledIntervie
                             <p className="text-blue-800">
                                 {new Date(myScheduledInterview[0].interviewer_start_at).toLocaleTimeString('es-ES', {
                                     hour: '2-digit',
-                                    minute: '2-digit'
+                                    minute: '2-digit',
+                                    hour12: false
                                 })}
                             </p>
                         </div>
