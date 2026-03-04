@@ -97,15 +97,12 @@ export default async function Home() {
               <div className="space-y-2 mb-6">
                 <div className="flex items-center justify-between text-sm">
                   <span>• Certificados académicos</span>
-                  <span className="text-orange-500">Pendiente</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span>• Documento de identidad</span>
-                  <span className="text-orange-500">Pendiente</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span>• Foto tipo carnet</span>
-                  <span className="text-orange-500">Pendiente</span>
                 </div>
               </div>
               <Link href="/documents/upload">
@@ -133,20 +130,16 @@ export default async function Home() {
               <div className="space-y-2 mb-6">
                 <div className="flex items-center justify-between text-sm text-gray-400">
                   <span>• Modalidad: Presencial/Virtual</span>
-                  <span>Disponible pronto</span>
+                  <span>Disponible</span>
                 </div>
                 <div className="flex items-center justify-between text-sm text-gray-400">
-                  <span>• Duración: 30 minutos</span>
-                  <span>---</span>
-                </div>
-                <div className="flex items-center justify-between text-sm text-gray-400">
-                  <span>• Horario: L-V 9am-5pm</span>
+                  <span>• Duración: 20 minutos</span>
                   <span>---</span>
                 </div>
               </div>
               <Link href="/interview">
                 <Button
-                  className="w-full bg-gray-400 text-white cursor-not-allowed"
+                  className="w-full bg-gray-500 text-white cursor-not-allowed"
                   disabled
                 >
                   Completar Documentos Primero
@@ -164,22 +157,12 @@ export default async function Home() {
                 Fechas Importantes
               </h3>
               <div className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600">Inicio de inscripciones</span>
-                  <span className="font-medium text-red-800">15 Enero 2026</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600">Cierre de inscripciones</span>
-                  <span className="font-medium text-red-800">28 Febrero 2026</span>
-                </div>
+
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-600">Entrevistas</span>
-                  <span className="font-medium text-red-800">1-15 Marzo 2026</span>
+                  <span className="font-medium text-red-800">9-22 Marzo 2026</span>
                 </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">Publicación de resultados</span>
-                  <span className="font-medium text-red-800">30 Marzo 2026</span>
-                </div>
+
               </div>
             </div>
 

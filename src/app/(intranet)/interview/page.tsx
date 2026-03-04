@@ -61,7 +61,7 @@ export default async function InterviewPage() {
                                 </ol>
                                 <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
                                     <p className="text-blue-800 font-medium">
-                                        Una vez que tus documentos sean aprobados, podrás agendar tu entrevista.
+                                        En la primera semana de marzo se habilitará el registro para entrevistas.
                                     </p>
                                 </div>
                             </div>
@@ -81,8 +81,8 @@ export default async function InterviewPage() {
                         <div className="flex-1">
                             <h3 className="font-semibold text-yellow-900 mb-2">Instrucciones Importantes</h3>
                             <ul className="text-sm text-yellow-800 space-y-1">
-                                <li>• Llega 5 minutos antes de tu cita programada</li>
-                                <li>• Trae tu DNI original y copia de todos los documentos enviados</li>
+                                <li>• Ingresa 5 minutos antes de tu cita programada</li>
+                                <li>• Tener a la mano tu DNI</li>
                                 <li>• La entrevista será evaluada por el comité académico</li>
                                 <li>• Si necesitas reprogramar, contacta con 48 horas de anticipación</li>
                             </ul>
