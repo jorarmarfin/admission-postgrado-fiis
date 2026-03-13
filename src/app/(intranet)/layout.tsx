@@ -87,7 +87,7 @@ export default function IntranetLayout({ children }: { children: React.ReactNode
                                 <p>Av. Túpac Amaru 210, Rímac</p>
                                 <p>Lima 25, Perú</p>
                                 <p>Teléfono: (01) 481-3030</p>
-                                <p>Email: admision@fiis.uni.edu.pe</p>
+                                <p>Email: pgfiissecretaria@uni.edu.pe</p>
                             </div>
                         </div>
                     </div>

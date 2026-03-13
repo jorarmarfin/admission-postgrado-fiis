@@ -203,7 +203,7 @@ export default async function DocumentsDownloadPage() {
 
                 {/* Footer informativo */}
                 <div className="mt-8 text-center text-sm text-gray-500">
-                    <p>¿Tienes problemas con las descargas? Contacta a: <a href="mailto:admision@fiis.uni.edu.pe" className="text-red-800 hover:text-red-900">admision@fiis.uni.edu.pe</a></p>
+                    <p>¿Tienes problemas con las descargas? Contacta a: <a href="mailto:pgfiissecretaria@uni.edu.pe" className="text-red-800 hover:text-red-900">pgfiissecretaria@uni.edu.pe</a></p>
                 </div>
             </div>
         </div>

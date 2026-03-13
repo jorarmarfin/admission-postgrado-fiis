@@ -28,7 +28,7 @@ export default async function DocumentsUploadPage() {
 
                 {/* Footer informativo */}
                 <div className="mt-8 text-center text-sm text-gray-500">
-                    <p>¿Problemas con la carga de archivos? Contacta a: <a href="mailto:admision@fiis.uni.edu.pe" className="text-red-800 hover:text-red-900">admision@fiis.uni.edu.pe</a></p>
+                    <p>¿Problemas con la carga de archivos? Contacta a: <a href="mailto:pgfiissecretaria@uni.edu.pe" className="text-red-800 hover:text-red-900">pgfiissecretaria@uni.edu.pe</a></p>
                 </div>
             </div>
         </div>

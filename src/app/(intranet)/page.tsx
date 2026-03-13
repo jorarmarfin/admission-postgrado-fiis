@@ -179,7 +179,7 @@ export default async function Home() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">Email</p>
-                    <p className="text-sm text-gray-600">admision@fiis.uni.edu.pe</p>
+                    <p className="text-sm text-gray-600">pgfiissecretaria@uni.edu.pe</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">

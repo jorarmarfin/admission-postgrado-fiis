@@ -93,8 +93,8 @@ export default async function InterviewPage() {
 
                 {/* Footer informativo */}
                 <div className="mt-8 text-center text-sm text-gray-500">
-                    <p>¿Tienes preguntas sobre la entrevista? Contacta a: <a href="mailto:admision@fiis.uni.edu.pe"
-                                                                             className="text-red-800 hover:text-red-900">admision@fiis.uni.edu.pe</a>
+                    <p>¿Tienes preguntas sobre la entrevista? Contacta a: <a href="mailto:pgfiissecretaria@uni.edu.pe"
+                                                                             className="text-red-800 hover:text-red-900">pgfiissecretaria@uni.edu.pe</a>
                     </p>
                 </div>
             </div>
