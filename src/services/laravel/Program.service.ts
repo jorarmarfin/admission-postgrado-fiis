@@ -16,7 +16,7 @@ export const programService = {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                 },
-                next: { tags: ['programs'], revalidate: 60 * 60 }, // Cache por 1 hora
+                cache: 'no-store',
             });
 
             if (!response.ok) {

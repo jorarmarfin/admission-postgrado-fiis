@@ -1,0 +1,336 @@
+### API Collection - Sistema de Admisión de Postgrado FIIS UNI
+### Base URL Configuration
+@baseUrl = http://postgrado-fiis.test
+@apiUrl = {{baseUrl}}/api
+
+### Authentication Variables
+@token = YOUR_TOKEN_HERE
+@applicantId = YOUR_APPLICANT_ID_HERE
+@programUuid = YOUR_PROGRAM_UUID_HERE
+
+---
+
+## ============================================
+## 📚 PROGRAMAS (Programs)
+## ============================================
+
+### GET - Obtener todos los programas
+GET {{apiUrl}}/admission/programs
+Content-Type: application/json
+Accept: application/json
+
+###
+
+### GET - Obtener un programa por UUID
+GET {{apiUrl}}/admission/program/{{programUuid}}
+Content-Type: application/json
+Accept: application/json
+
+###
+
+### GET - Obtener documentos requeridos de un programa
+GET {{apiUrl}}/admission/program/{{programUuid}}/documents
+Content-Type: application/json
+Accept: application/json
+
+---
+
+## ============================================
+## 🔐 AUTENTICACIÓN (Authentication)
+## ============================================
+
+### POST - Login
+POST {{apiUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "usuario@example.com",
+  "password": "password123"
+}
+
+### ⬆️ Response:
+# {
+#   "status": "success",
+#   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+#   "user": {
+#     "id": 1,
+#     "name": "Juan Pérez",
+#     "email": "usuario@example.com",
+#     "roles": [
+#       {
+#         "id": 1,
+#         "name": "postulante",
+#         "guard_name": "api"
+#       }
+#     ]
+#   },
+#   "role": ["postulante"],
+#   "message": "Login exitoso"
+# }
+
+###
+
+### GET - Obtener usuario actual (Requiere token)
+GET {{apiUrl}}/auth/user
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### POST - Logout (Requiere token)
+POST {{apiUrl}}/logout
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### ⚠️ NOTA SOBRE AUTENTICACIÓN
+# Para cualquier endpoint protegido, debe incluir el header:
+# Authorization: Bearer <tu_token_aqui>
+#
+# El token se obtiene del response del login y debe ser persistido
+# en la sesión de NextAuth para usar en requests posteriores.
+#
+# En componentes de React:
+# const { data: session } = useSession();
+# const token = session?.accessToken;
+
+---
+
+## ============================================
+## 👤 POSTULANTES (Applicants)
+## ============================================
+
+### POST - Registrar nuevo postulante
+POST {{apiUrl}}/applicant/register
+Content-Type: application/json
+
+{
+  "first_name": "Juan",
+  "last_name": "Pérez",
+  "email": "juan.perez@example.com",
+  "phone": "+51987654321",
+  "program_uuid": "{{programUuid}}"
+}
+
+###
+
+### GET - Obtener datos del postulante
+GET {{apiUrl}}/applicant/{{applicantId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### PUT - Actualizar datos del postulante
+PUT {{apiUrl}}/applicant/{{applicantId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "first_name": "Juan",
+  "last_name": "Pérez García",
+  "phone": "+51987654321"
+}
+
+###
+
+### POST - Subir documentos del postulante
+POST {{apiUrl}}/applicant/{{applicantId}}/documents
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Authorization: Bearer {{token}}
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="document_type_id"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="document"; filename="documento.pdf"
+Content-Type: application/pdf
+
+< ./public/sample.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+---
+
+## ============================================
+## 📄 DOCUMENTOS (Documents)
+## ============================================
+
+### GET - Obtener tipos de documentos
+GET {{apiUrl}}/document-types
+Content-Type: application/json
+Accept: application/json
+
+###
+
+### GET - Obtener documentos del postulante
+GET {{apiUrl}}/applicant/{{applicantId}}/documents
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### GET - Descargar documento (usando full_url)
+GET {{baseUrl}}/storage/documents/filename.pdf
+Accept: application/pdf
+
+---
+
+## ============================================
+## 🎤 ENTREVISTAS (Interviews)
+## ============================================
+
+### GET - Obtener disponibilidades de entrevistas
+GET {{apiUrl}}/interview/availabilities
+Content-Type: application/json
+Accept: application/json
+
+###
+
+### GET - Obtener citas de entrevista del postulante
+GET {{apiUrl}}/interview/appointments
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### POST - Programar entrevista
+POST {{apiUrl}}/interview/appointments
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "interview_availability_id": 1,
+  "applicant_id": "{{applicantId}}"
+}
+
+###
+
+### PUT - Actualizar cita de entrevista
+PUT {{apiUrl}}/interview/appointments/{{appointmentId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "interview_availability_id": 2
+}
+
+###
+
+### DELETE - Cancelar cita de entrevista
+DELETE {{apiUrl}}/interview/appointments/{{appointmentId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+---
+
+## ============================================
+## 🏫 PERIODOS ACADÉMICOS (Academic Periods)
+## ============================================
+
+### GET - Obtener periodos académicos
+GET {{apiUrl}}/academic-periods
+Content-Type: application/json
+Accept: application/json
+
+###
+
+### GET - Obtener periodo académico activo
+GET {{apiUrl}}/academic-periods/active
+Content-Type: application/json
+Accept: application/json
+
+---
+
+## ============================================
+## 🏦 BANCOS (Banks)
+## ============================================
+
+### GET - Obtener lista de bancos
+GET {{apiUrl}}/banks
+Content-Type: application/json
+Accept: application/json
+
+---
+
+## ============================================
+## 🏫 UNIVERSIDAD (University)
+## ============================================
+
+### GET - Obtener información de la universidad
+GET {{apiUrl}}/university
+Content-Type: application/json
+Accept: application/json
+
+###
+
+### GET - Obtener facultades
+GET {{apiUrl}}/university/faculties
+Content-Type: application/json
+Accept: application/json
+
+---
+
+## ============================================
+## 📋 SOLICITUDES (Applications)
+## ============================================
+
+### GET - Obtener solicitud del postulante
+GET {{apiUrl}}/application/{{applicantId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### GET - Obtener estado de solicitud
+GET {{apiUrl}}/application/{{applicantId}}/status
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+---
+
+## ============================================
+## 💡 NOTAS Y REFERENCIAS
+## ============================================
+
+# Variables de entorno necesarias:
+# NEXT_BACKEND_API_URL=http://postgrado-fiis.test
+# NEXTAUTH_URL=http://localhost:3000
+# NEXTAUTH_SECRET=tu_secret_aqui
+
+# Instrucciones de uso en WebStorm/IntelliJ:
+# 1. Abre este archivo (api.http)
+# 2. Reemplaza las variables en @<variable>
+# 3. Haz clic en "Send Request" (botón verde) en cada endpoint
+# 4. Ver respuestas en el panel de abajo
+
+# Headers comunes:
+# - Content-Type: application/json (para JSON)
+# - Authorization: Bearer <token> (para endpoints protegidos)
+# - Accept: application/json (para especificar formato esperado)
+
+# Códigos de respuesta esperados:
+# 200 - OK
+# 201 - Created
+# 204 - No Content
+# 400 - Bad Request
+# 401 - Unauthorized
+# 403 - Forbidden
+# 404 - Not Found
+# 422 - Unprocessable Entity
+# 500 - Internal Server Error
+
+# Ejemplo de token (reemplazar con token real):
+# eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+# Para más información, consultar context.md en la raíz del proyecto
+
