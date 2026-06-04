@@ -83,8 +83,8 @@ export default async function InterviewPage() {
                             <ul className="text-sm text-yellow-800 space-y-1">
                                 <li>• Ingresa 5 minutos antes de tu cita programada</li>
                                 <li>• Tener a la mano tu DNI</li>
-                                <li>• La entrevista será evaluada por el comité académico</li>
-                                <li>• Si necesitas reprogramar, contacta con 48 horas de anticipación</li>
+                                <li>• La evaluación estará a cargo del docente designado</li>
+                                <li>• &quot;La reprogramación de entrevistas deberá solicitarse con un mínimo de 48 horas de anticipación y comunicarse al número 969 285 776.&quot;</li>
                             </ul>
                         </div>
                     </div>

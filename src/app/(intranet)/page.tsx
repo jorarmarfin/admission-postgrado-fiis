@@ -53,16 +53,12 @@ export default async function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
-                Documentos para Descargar
+                1.° Casilla
               </h3>
               <p className="text-gray-600 mb-6">
                 Descarga todos los formatos, guías y documentos necesarios para completar tu proceso de admisión.
               </p>
               <div className="space-y-2 mb-6">
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <span>• Guía del postulante</span>
-                  <span className="text-green-600">PDF</span>
-                </div>
                 <div className="flex items-center justify-between text-sm text-gray-500">
                   <span>• Formatos de inscripción</span>
                   <span className="text-green-600">PDF</span>
@@ -89,20 +85,32 @@ export default async function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
-                Cargar Documentos
+                2. Casilla – Cargar Documentos
               </h3>
               <p className="text-gray-600 mb-6">
                 Sube todos los documentos requeridos de manera segura. Formatos aceptados: PDF, JPG, PNG.
               </p>
               <div className="space-y-2 mb-6">
                 <div className="flex items-center justify-between text-sm">
-                  <span>• Certificados académicos</span>
+                  <span>• Ficha del Postulante (formato adjunto).</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span>• Documento de identidad</span>
+                  <span>• Solicitud dirigida al Director de la Escuela Central de Posgrado – UNI (formato adjunto).</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span>• Foto tipo carnet</span>
+                  <span>• Declaración Jurada (formato adjunto).</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span>• Currículum Vitae.</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span>• Copia del grado de Bachiller.</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span>• Copia legible del DNI por ambos lados.</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span>• Problemática de investigación (formato adjunto).</span>
                 </div>
               </div>
               <Link href="/documents/upload">
@@ -122,7 +130,7 @@ export default async function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
-                Agendar Entrevista
+                3.° Casilla
               </h3>
               <p className="text-gray-600 mb-6">
                 Programa tu entrevista personal con el comité de admisión. Disponible una vez completada la documentación.
@@ -190,7 +198,7 @@ export default async function Home() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">Teléfono</p>
-                    <p className="text-sm text-gray-600">(01) 481-3030</p>
+                    <p className="text-sm text-gray-600">(01) 481-1070, Anexo 5210</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -201,7 +209,7 @@ export default async function Home() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">Horario de Atención</p>
-                    <p className="text-sm text-gray-600">Lun - Vie: 9:00 AM - 5:00 PM</p>
+                    <p className="text-sm text-gray-600">Lun - Vie: 9:00 AM - 8:00 PM</p>
                   </div>
                 </div>
               </div>

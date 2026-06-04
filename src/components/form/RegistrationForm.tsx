@@ -421,7 +421,7 @@ export const RegistrationForm = ({
                         </div>
 
                         <div>
-                            <Label htmlFor="universidad">Universidad *</Label>
+                            <Label htmlFor="universidad">Universidad de origen de pregrado *</Label>
                             <Select onValueChange={(value) => form.setValue("universidad", value)} value={form.watch("universidad")}>
                                 <SelectTrigger className={`w-full ${form.formState.errors.universidad ? 'border-red-500' : ''}`}>
                                     <SelectValue placeholder="Seleccione una universidad" />
@@ -441,7 +441,7 @@ export const RegistrationForm = ({
                     </div>
 
                     <div className="mt-6">
-                        <Label htmlFor="carreraProfesional">Carrera Profesional *</Label>
+                        <Label htmlFor="carreraProfesional">Digite su carrera profesional *</Label>
                         <Input
                             id="carreraProfesional"
                             {...form.register("carreraProfesional")}
