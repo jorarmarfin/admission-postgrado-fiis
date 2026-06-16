@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { diplomadoService } from "@/services"
 import { Metadata } from "next"
+import { IDiplomadoProgram } from "@/interfaces"
 
 export const dynamic = 'force-dynamic'
 
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 }
 
 export default async function DiplomadoPage() {
-    let programs = []
+    let programs: IDiplomadoProgram[] = []
     try {
         programs = await diplomadoService.getPrograms()
     } catch {
