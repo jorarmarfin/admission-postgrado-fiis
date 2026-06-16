@@ -7,3 +7,4 @@ export { documentTypesService } from './laravel/DocumentTypes.service';
 export { loginService } from './laravel/Login.service';
 export { interviewAvailabilitiesService } from './laravel/InterviewAvailabilities.service';
 export { interviewAppointmentService } from './laravel/InterviewAppointment.service';
+export { diplomadoService } from './laravel/Diplomado.service';

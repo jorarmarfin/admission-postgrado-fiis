@@ -3,7 +3,7 @@ import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 
 // Rutas que no requieren autenticación
-const publicRoutes = ["/auth/login", "/api/auth","/admission"];
+const publicRoutes = ["/auth/login", "/api/auth", "/admission", "/diplomado"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

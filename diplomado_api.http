@@ -1,0 +1,112 @@
+### Variables
+@baseUrl = http://postgrado-fiis.test/api
+@token = REEMPLAZAR_CON_TOKEN_REAL
+@bearerToken = REEMPLAZAR_CON_SANCTUM_TOKEN
+
+###
+### 1. Listar diplomados activos
+GET {{baseUrl}}/diplomado/programs
+Accept: application/json
+
+###
+### 2. Registrar inscripción (boleta)
+POST {{baseUrl}}/diplomado/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "program_id": 1,
+  "academic_period_id": 1,
+  "full_name": "Juan Carlos Pérez García",
+  "dni": "12345678",
+  "birthdate": "1990-05-15",
+  "phone": "987654321",
+  "email": "juan.perez@ejemplo.com",
+  "address": "Av. Universitaria 1234",
+  "city": "Lima",
+  "university": "Universidad Nacional de Ingeniería",
+  "academic_degree": "bachelor",
+  "career": "Ingeniería de Sistemas",
+  "voucher_type": "boleta"
+}
+
+###
+### 3. Registrar inscripción (factura)
+POST {{baseUrl}}/diplomado/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "program_id": 1,
+  "academic_period_id": 1,
+  "full_name": "María López Torres",
+  "dni": "87654321",
+  "birthdate": "1985-09-20",
+  "phone": "912345678",
+  "email": "maria.lopez@empresa.com",
+  "address": "Jr. Comercio 567",
+  "city": "Arequipa",
+  "university": "Universidad Católica Santa María",
+  "academic_degree": "graduate",
+  "career": "Administración de Empresas",
+  "voucher_type": "factura",
+  "razon_social": "Empresa Consulting SAC",
+  "ruc": "20123456789",
+  "fiscal_address": "Av. Industrial 456, Arequipa",
+  "invoice_email": "facturacion@empresa.com"
+}
+
+###
+### 4. Registrar inscripción (egresado)
+POST {{baseUrl}}/diplomado/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "program_id": 1,
+  "academic_period_id": 1,
+  "full_name": "Carlos Mamani Quispe",
+  "dni": "45678901",
+  "birthdate": "1998-03-10",
+  "phone": "965432187",
+  "email": "carlos.mamani@gmail.com",
+  "address": "Calle Los Álamos 789",
+  "city": "Cusco",
+  "university": "Universidad Andina del Cusco",
+  "academic_degree": "egresado",
+  "career": "Ingeniería de Sistemas e Informática",
+  "voucher_type": "boleta"
+}
+
+###
+### 5. Consultar estado de inscripción por token
+GET {{baseUrl}}/diplomado/registration/{{token}}
+Accept: application/json
+
+###
+### 6. Consultar estado — token inválido (espera 404)
+GET {{baseUrl}}/diplomado/registration/token-inexistente-xyz
+Accept: application/json
+
+###
+# =====================================================
+# PORTAL DEL ESTUDIANTE DIPLOMADO (requiere auth:sanctum)
+# =====================================================
+
+###
+### 7. Mi diplomado — estado de matrícula y resumen de pagos
+GET {{baseUrl}}/portal/diplomado/me
+Accept: application/json
+Authorization: Bearer {{bearerToken}}
+
+###
+### 8. Mis cargos — listado pagados y pendientes
+GET {{baseUrl}}/portal/diplomado/charges
+Accept: application/json
+Authorization: Bearer {{bearerToken}}
+
+###
+### 9. Opciones de pago para una cuota específica
+GET {{baseUrl}}/portal/diplomado/charges/1/payment-options
+Accept: application/json
+Authorization: Bearer {{bearerToken}}

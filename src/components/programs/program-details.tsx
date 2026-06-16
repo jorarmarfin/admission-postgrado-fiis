@@ -122,6 +122,72 @@ export const ProgramDetails = ({ programUuid }: ProgramDetailsProps) => {
                 </div>
             </div>
 
+            {/* Fechas Importantes e Información Adicional */}
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Fechas Importantes */}
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Fechas Importantes</h3>
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-start pb-3 border-b border-gray-100">
+                                <span className="text-gray-700 font-medium">Inscripciones</span>
+                                <span className="text-red-700 font-semibold text-right">2 de junio al 16 de agosto</span>
+                            </div>
+                            <div className="flex justify-between items-start pb-3 border-b border-gray-100">
+                                <span className="text-gray-700 font-medium">Evaluación de Méritos y Conocimientos</span>
+                                <span className="text-red-700 font-semibold text-right">18 de agosto al 23 de agosto</span>
+                            </div>
+                            <div className="flex justify-between items-start pb-3 border-b border-gray-100">
+                                <span className="text-gray-700 font-medium">Matrícula</span>
+                                <span className="text-red-700 font-semibold text-right">25 de agosto al 29 de agosto</span>
+                            </div>
+                            <div className="flex justify-between items-start pb-3 border-b border-gray-100">
+                                <span className="text-gray-700 font-medium">Inicio de Ciclo Académico</span>
+                                <span className="text-red-700 font-semibold text-right">1 de septiembre</span>
+                            </div>
+                            <div className="flex justify-between items-start">
+                                <span className="text-gray-700 font-medium">Cierre de Ciclo Académico</span>
+                                <span className="text-red-700 font-semibold text-right">27 de diciembre</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Contacto y Soporte */}
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Contacto y Soporte</h3>
+                        <div className="space-y-4">
+                            <div className="flex items-start space-x-3">
+                                <div className="w-8 h-8 rounded-full bg-red-800 text-white flex items-center justify-center text-sm flex-shrink-0">
+                                    ✉
+                                </div>
+                                <div>
+                                    <p className="font-medium text-gray-900">Email</p>
+                                    <p className="text-gray-600 text-sm">pgiisecretaria@uni.edu.pe</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start space-x-3">
+                                <div className="w-8 h-8 rounded-full bg-red-800 text-white flex items-center justify-center text-sm flex-shrink-0">
+                                    ☎
+                                </div>
+                                <div>
+                                    <p className="font-medium text-gray-900">Teléfono</p>
+                                    <p className="text-gray-600 text-sm">(01) 481-1070, Anexo 5210</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start space-x-3">
+                                <div className="w-8 h-8 rounded-full bg-red-800 text-white flex items-center justify-center text-sm flex-shrink-0">
+                                    🕒
+                                </div>
+                                <div>
+                                    <p className="font-medium text-gray-900">Horario de Atención</p>
+                                    <p className="text-gray-600 text-sm">Lun - Vie: 9:00 AM - 8:00 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Documentos del Programa */}
             <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
                 <ProgramDocuments

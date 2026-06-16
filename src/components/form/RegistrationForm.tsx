@@ -534,6 +534,49 @@ export const RegistrationForm = ({
                     )}
                 </div>
 
+                {/* Información Adicional */}
+                <div className="pb-8 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                        <div className="w-6 h-6 bg-red-800 rounded-full flex items-center justify-center mr-3">
+                            <span className="text-white text-sm font-bold">4</span>
+                        </div>
+                        Información Adicional
+                    </h3>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
+                            <thead>
+                                <tr className="bg-gray-100 border border-gray-200">
+                                    <th className="border border-gray-200 px-4 py-3 text-left font-semibold text-gray-900">Actividad</th>
+                                    <th className="border border-gray-200 px-4 py-3 text-left font-semibold text-gray-900">Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr className="border border-gray-200 hover:bg-gray-50">
+                                    <td className="border border-gray-200 px-4 py-3 text-gray-800">Inscripciones</td>
+                                    <td className="border border-gray-200 px-4 py-3 text-gray-700">2 de junio al 16 de agosto</td>
+                                </tr>
+                                <tr className="border border-gray-200 hover:bg-gray-50">
+                                    <td className="border border-gray-200 px-4 py-3 text-gray-800">Evaluación de Méritos y Conocimientos</td>
+                                    <td className="border border-gray-200 px-4 py-3 text-gray-700">18 de agosto al 23 de agosto</td>
+                                </tr>
+                                <tr className="border border-gray-200 hover:bg-gray-50">
+                                    <td className="border border-gray-200 px-4 py-3 text-gray-800">Matrícula</td>
+                                    <td className="border border-gray-200 px-4 py-3 text-gray-700">25 de agosto al 29 de agosto</td>
+                                </tr>
+                                <tr className="border border-gray-200 hover:bg-gray-50">
+                                    <td className="border border-gray-200 px-4 py-3 text-gray-800">Inicio de Ciclo Académico</td>
+                                    <td className="border border-gray-200 px-4 py-3 text-gray-700">1 de septiembre</td>
+                                </tr>
+                                <tr className="border border-gray-200 hover:bg-gray-50">
+                                    <td className="border border-gray-200 px-4 py-3 text-gray-800">Cierre de Ciclo Académico</td>
+                                    <td className="border border-gray-200 px-4 py-3 text-gray-700">27 de diciembre</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 {/* Botones de acción */}
                 <div className="flex justify-center space-x-4 pt-6 border-t border-gray-200">
                     <Button

@@ -7,6 +7,7 @@ export const Image404 = () => {
         src="/images/404.jpg"
         alt="Imagen de error 404"
         width={100}
+        height={100}
         className="object-cover w-full h-full"
     />
 }
