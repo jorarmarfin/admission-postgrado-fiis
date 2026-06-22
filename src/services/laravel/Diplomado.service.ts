@@ -24,10 +24,32 @@ export const diplomadoService = {
     },
 
     async register(payload: IDiplomadoRegistrationRequest): Promise<IDiplomadoRegistrationResponse> {
+        const formData = new FormData();
+        formData.append('program_id', String(payload.program_id));
+        formData.append('academic_period_id', String(payload.academic_period_id));
+        formData.append('full_name', payload.full_name);
+        formData.append('dni', payload.dni);
+        formData.append('birthdate', payload.birthdate);
+        formData.append('phone', payload.phone);
+        formData.append('email', payload.email);
+        formData.append('address', payload.address);
+        formData.append('city', payload.city);
+        formData.append('university', payload.university);
+        formData.append('academic_degree', payload.academic_degree);
+        formData.append('career', payload.career);
+        formData.append('academic_document', payload.academic_document);
+        formData.append('voucher_type', payload.voucher_type);
+        if (payload.voucher_type === 'factura') {
+            if (payload.razon_social) formData.append('razon_social', payload.razon_social);
+            if (payload.ruc) formData.append('ruc', payload.ruc);
+            if (payload.fiscal_address) formData.append('fiscal_address', payload.fiscal_address);
+            if (payload.invoice_email) formData.append('invoice_email', payload.invoice_email);
+        }
+
         const response = await fetch(`${API_BASE_URL}/diplomado/register`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify(payload),
+            headers: { 'Accept': 'application/json' },
+            body: formData,
         });
 
         const data = await response.json();

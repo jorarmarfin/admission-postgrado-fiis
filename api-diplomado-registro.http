@@ -1,0 +1,142 @@
+### Registrar postulante a diplomado (con documento académico PDF)
+POST /api/diplomado/register
+Content-Type: multipart/form-data; boundary=----FormBoundary
+
+------FormBoundary
+Content-Disposition: form-data; name="program_id"
+
+1
+------FormBoundary
+Content-Disposition: form-data; name="academic_period_id"
+
+1
+------FormBoundary
+Content-Disposition: form-data; name="full_name"
+
+Juan Pérez García
+------FormBoundary
+Content-Disposition: form-data; name="dni"
+
+12345678
+------FormBoundary
+Content-Disposition: form-data; name="birthdate"
+
+1990-05-15
+------FormBoundary
+Content-Disposition: form-data; name="phone"
+
+987654321
+------FormBoundary
+Content-Disposition: form-data; name="email"
+
+juan.perez@example.com
+------FormBoundary
+Content-Disposition: form-data; name="address"
+
+Av. Universitaria 1234
+------FormBoundary
+Content-Disposition: form-data; name="city"
+
+Lima
+------FormBoundary
+Content-Disposition: form-data; name="university"
+
+Universidad Nacional Mayor de San Marcos
+------FormBoundary
+Content-Disposition: form-data; name="academic_degree"
+
+bachelor
+------FormBoundary
+Content-Disposition: form-data; name="career"
+
+Ingeniería de Sistemas
+------FormBoundary
+Content-Disposition: form-data; name="academic_document"; filename="bachiller.pdf"
+Content-Type: application/pdf
+
+< ./bachiller.pdf
+------FormBoundary
+Content-Disposition: form-data; name="voucher_type"
+
+boleta
+------FormBoundary--
+
+
+### Registrar postulante con factura
+POST /api/diplomado/register
+Content-Type: multipart/form-data; boundary=----FormBoundary
+
+------FormBoundary
+Content-Disposition: form-data; name="program_id"
+
+1
+------FormBoundary
+Content-Disposition: form-data; name="academic_period_id"
+
+1
+------FormBoundary
+Content-Disposition: form-data; name="full_name"
+
+María López Torres
+------FormBoundary
+Content-Disposition: form-data; name="dni"
+
+87654321
+------FormBoundary
+Content-Disposition: form-data; name="birthdate"
+
+1985-03-22
+------FormBoundary
+Content-Disposition: form-data; name="phone"
+
+912345678
+------FormBoundary
+Content-Disposition: form-data; name="email"
+
+maria.lopez@empresa.com
+------FormBoundary
+Content-Disposition: form-data; name="address"
+
+Jr. Los Pinos 456
+------FormBoundary
+Content-Disposition: form-data; name="city"
+
+Arequipa
+------FormBoundary
+Content-Disposition: form-data; name="university"
+
+Universidad Católica de Santa María
+------FormBoundary
+Content-Disposition: form-data; name="academic_degree"
+
+master
+------FormBoundary
+Content-Disposition: form-data; name="career"
+
+Administración de Empresas
+------FormBoundary
+Content-Disposition: form-data; name="academic_document"; filename="titulo.pdf"
+Content-Type: application/pdf
+
+< ./titulo.pdf
+------FormBoundary
+Content-Disposition: form-data; name="voucher_type"
+
+factura
+------FormBoundary
+Content-Disposition: form-data; name="razon_social"
+
+Empresa SAC
+------FormBoundary
+Content-Disposition: form-data; name="ruc"
+
+20123456789
+------FormBoundary
+Content-Disposition: form-data; name="fiscal_address"
+
+Av. Industrial 789, Lima
+------FormBoundary
+Content-Disposition: form-data; name="invoice_email"
+
+facturacion@empresa.com
+------FormBoundary--

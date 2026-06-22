@@ -1,6 +1,7 @@
 "use client"
 
 import { useForm } from "react-hook-form"
+import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Button } from "@/components/ui/button"
@@ -94,6 +95,9 @@ export const DiplomadoRegistrationForm = ({ program, academic_period_id }: Props
     const { isLoading, error, success, registrationData, validationErrors, submitRegistration, resetState } =
         useDiplomadoRegistrationForm()
 
+    const [academicDocument, setAcademicDocument] = useState<File | null>(null)
+    const [fileError, setFileError] = useState<string | null>(null)
+
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -107,6 +111,20 @@ export const DiplomadoRegistrationForm = ({ program, academic_period_id }: Props
     const watchVoucherType = form.watch("voucher_type")
 
     const onSubmit = async (data: FormData) => {
+        if (!academicDocument) {
+            setFileError("El documento académico (bachiller/título/constancia) es obligatorio")
+            return
+        }
+        if (academicDocument.type !== 'application/pdf') {
+            setFileError("Solo se aceptan archivos PDF")
+            return
+        }
+        if (academicDocument.size > 5 * 1024 * 1024) {
+            setFileError("El documento no puede superar los 5 MB")
+            return
+        }
+        setFileError(null)
+
         const payload: IDiplomadoRegistrationRequest = {
             program_id: program.id,
             academic_period_id,
@@ -120,6 +138,7 @@ export const DiplomadoRegistrationForm = ({ program, academic_period_id }: Props
             university: data.university,
             academic_degree: data.academic_degree,
             career: data.career,
+            academic_document: academicDocument,
             voucher_type: data.voucher_type,
             razon_social: data.voucher_type === "factura" ? data.razon_social || null : null,
             ruc: data.voucher_type === "factura" ? data.ruc || null : null,
@@ -128,10 +147,10 @@ export const DiplomadoRegistrationForm = ({ program, academic_period_id }: Props
         }
 
         const ok = await submitRegistration(payload)
-        if (ok) form.reset()
+        if (ok) { form.reset(); setAcademicDocument(null) }
     }
 
-    const handleReset = () => { form.reset(); resetState() }
+    const handleReset = () => { form.reset(); resetState(); setAcademicDocument(null); setFileError(null) }
 
     const stepDot = (n: number) => (
         <div className="w-6 h-6 bg-blue-700 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
@@ -363,12 +382,38 @@ export const DiplomadoRegistrationForm = ({ program, academic_period_id }: Props
                         {fieldError(form.formState.errors.career?.message)}
                     </div>
 
+                    <div className="mt-6">
+                        <Label htmlFor="academic_document">
+                            Documento académico (bachiller / título / constancia) *
+                        </Label>
+                        <div className={`mt-1 flex items-center gap-3 rounded-md border px-3 py-2 ${fileError ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}>
+                            <input
+                                id="academic_document"
+                                type="file"
+                                accept=".pdf,application/pdf"
+                                className="flex-1 text-sm text-gray-700 file:mr-3 file:rounded file:border-0 file:bg-blue-50 file:px-3 file:py-1 file:text-xs file:font-medium file:text-blue-700 hover:file:bg-blue-100"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0] ?? null
+                                    setAcademicDocument(file)
+                                    setFileError(null)
+                                }}
+                            />
+                            {academicDocument && (
+                                <span className="text-xs text-gray-500 whitespace-nowrap">
+                                    {(academicDocument.size / 1024 / 1024).toFixed(2)} MB
+                                </span>
+                            )}
+                        </div>
+                        <p className="mt-1 text-xs text-gray-500">Solo PDF · máx. 5 MB</p>
+                        {fileError && <p className="mt-1 text-sm text-red-600">{fileError}</p>}
+                    </div>
+
                     {form.watch("academic_degree") === "egresado" && (
                         <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex gap-3">
                             <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                             <p className="text-sm text-yellow-800">
-                                Como egresado deberás adjuntar una <strong>constancia de egresado</strong> emitida
-                                por tu universidad. La administración te informará cómo enviarla.
+                                Como egresado debes subir la <strong>constancia de egresado</strong> emitida
+                                por tu universidad como documento académico.
                             </p>
                         </div>
                     )}

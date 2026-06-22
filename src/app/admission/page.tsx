@@ -11,7 +11,12 @@ export const metadata: Metadata = {
 }
 
 export default async function AdmissionPage() {
-    const programs = await programService.getAllPrograms()
+    const allPrograms = await programService.getAllPrograms()
+
+    // Excluir diplomados — tienen su propia ruta /diplomado
+    const programs = allPrograms.filter(
+        (p) => p.program_types.name.toLowerCase() !== 'diplomado'
+    )
 
     // Agrupar programas por tipo
     const programsByType = programs.reduce((acc, program) => {

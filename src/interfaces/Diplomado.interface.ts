@@ -23,6 +23,7 @@ export interface IDiplomadoRegistrationRequest {
     university: string;
     academic_degree: AcademicDegree;
     career: string;
+    academic_document: File;
     voucher_type: VoucherType;
     razon_social?: string | null;
     ruc?: string | null;
