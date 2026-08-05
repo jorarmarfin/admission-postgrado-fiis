@@ -5,6 +5,7 @@ import {academicPeriodService} from "@/services";
 import {Metadata} from "next";
 import {authOptions} from "@/lib/auth";
 import {getServerSession} from "next-auth";
+import {UploadDocumentsList} from "./_components/upload-documents-list";
 
 export const metadata: Metadata = {
     title: "Panel de Admisión",
@@ -90,29 +91,7 @@ export default async function Home() {
               <p className="text-gray-600 mb-6">
                 Sube todos los documentos requeridos de manera segura. Formatos aceptados: PDF, JPG, PNG.
               </p>
-              <div className="space-y-2 mb-6">
-                <div className="flex items-center justify-between text-sm">
-                  <span>• Ficha del Postulante (formato adjunto).</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span>• Solicitud dirigida al Director de la Escuela Central de Posgrado – UNI (formato adjunto).</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span>• Declaración Jurada (formato adjunto).</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span>• Currículum Vitae.</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span>• Copia del grado de Bachiller.</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span>• Copia legible del DNI por ambos lados.</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span>• Problemática de investigación (formato adjunto).</span>
-                </div>
-              </div>
+              <UploadDocumentsList />
               <Link href="/documents/upload">
                 <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                   Cargar Documentos
