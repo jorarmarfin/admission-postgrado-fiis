@@ -59,16 +59,6 @@ export default async function Home() {
               <p className="text-gray-600 mb-6">
                 Descarga todos los formatos, guías y documentos necesarios para completar tu proceso de admisión.
               </p>
-              <div className="space-y-2 mb-6">
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <span>• Formatos de inscripción</span>
-                  <span className="text-green-600">PDF</span>
-                </div>
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <span>• Lista de requisitos</span>
-                  <span className="text-green-600">PDF</span>
-                </div>
-              </div>
               <Link href="/documents/download">
                 <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
                   Descargar Documentos
@@ -91,7 +81,6 @@ export default async function Home() {
               <p className="text-gray-600 mb-6">
                 Sube todos los documentos requeridos de manera segura. Formatos aceptados: PDF, JPG, PNG.
               </p>
-              <UploadDocumentsList />
               <Link href="/documents/upload">
                 <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                   Cargar Documentos
@@ -114,16 +103,6 @@ export default async function Home() {
               <p className="text-gray-600 mb-6">
                 Programa tu entrevista personal con el comité de admisión. Disponible una vez completada la documentación.
               </p>
-              <div className="space-y-2 mb-6">
-                <div className="flex items-center justify-between text-sm text-gray-400">
-                  <span>• Modalidad: Presencial/Virtual</span>
-                  <span>Disponible</span>
-                </div>
-                <div className="flex items-center justify-between text-sm text-gray-400">
-                  <span>• Duración: 20 minutos</span>
-                  <span>---</span>
-                </div>
-              </div>
               <Link href="/interview">
                 <Button
                   className="w-full bg-gray-500 text-white cursor-not-allowed"
