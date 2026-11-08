@@ -21,8 +21,10 @@ export async function middleware(request: NextRequest) {
 
   // Si no hay token y la ruta no es pública, redirigir al login
   if (!token) {
-    const url = new URL("/auth/login", request.url);
-    url.searchParams.set("callbackUrl", encodeURI(request.url));
+    const origin = process.env.NEXTAUTH_URL ?? request.nextUrl.origin;
+    const url = new URL("/auth/login", origin);
+    const callback = new URL(pathname + request.nextUrl.search, origin).toString();
+    url.searchParams.set("callbackUrl", callback);
     return NextResponse.redirect(url);
   }
 
